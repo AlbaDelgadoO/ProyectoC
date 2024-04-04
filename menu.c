@@ -4,7 +4,7 @@
 #include "sqlite3.h"
 #include "database.h"
 #include "menu.h"
-
+#include "prestamos.h" 
 
 void agregarNuevoLibro(sqlite3* db) {
     // Solicitar detalles del nuevo libro al usuario
@@ -93,7 +93,7 @@ void ejecutarMenuPrincipal(sqlite3* db) {
                 // Lógica para ejecutar el menú de gestión de usuarios
                 break;
             case 3:
-                // Lógica para ejecutar el menú de gestión de préstamos
+                ejecutarMenuPrestamos(db);
                 break;
             case 4:
                 // Lógica para ejecutar el menú de configuración del sistema
