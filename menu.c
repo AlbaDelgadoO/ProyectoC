@@ -70,7 +70,8 @@ void ejecutarMenuLibros(sqlite3* db) {
     } while (opcion != 4);
 }
 
-// GESTION USUARIOS
+// GESTION DE USUARIOS
+
 void agregarNuevoUsuario(sqlite3* db) {
 // Solicitar detalles del nuevo usuario
     printf("Ingrese el ID del usuario: ");
@@ -112,6 +113,23 @@ void agregarNuevoUsuario(sqlite3* db) {
     printf("El nuevo usuario ha sido agregado correctamente.\n");
 }
 
+void buscarUsuario(sqlite3* db) {
+    printf("Ingrese el ID o nombre del usuario: ");
+    char termino[50];
+    scanf("%s", termino);
+
+    buscarUsuariosDB(db, termino);
+}
+
+void editarUsuario(sqlite3* db){
+    printf("Introduce el ID del usuario que deseas editar: ");
+    char id[50];
+    scanf("%s", id);
+
+    editarUsuarioDB(db, id);
+}
+
+
 void mostrarMenuUsuarios() {
     printf("=== Menu de Gestion de Usuarios ===\n");
     printf("1. Agregar Nuevo Usuario\n");
@@ -133,13 +151,13 @@ void ejecutarMenuUsuarios(sqlite3* db) {
                 agregarNuevoUsuario(db);
                 break;
             case 2:
-                // Lógica para mostrar todos los usuarios
+                leerUsuarios(db);
                 break;
             case 3:
-                // Lógica para buscar un usuario
+                buscarUsuario(db);
                 break;
             case 4:
-                // Lógica para editar un usuario
+                editarUsuario(db);
                 break;
             case 5:
                 // Lógica para eliminar un usuario
