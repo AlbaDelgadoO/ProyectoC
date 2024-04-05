@@ -9,4 +9,9 @@ void mostrarMenuLibros();
 void ejecutarMenuLibros(sqlite3* db);
 void buscarLibro(sqlite3* db);
 
+// USUARIOS
+void agregarNuevoUsuario(sqlite3* db);
+void mostrarMenuUsuarios();
+void ejecutarMenuUsuarios(sqlite3* db);
+
 #endif /* MENU_H */

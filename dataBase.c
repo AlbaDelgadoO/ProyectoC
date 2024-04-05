@@ -112,3 +112,52 @@ void buscarLibroBD(sqlite3* db, const char* termino) {
 
     sqlite3_finalize(stmt);
 }
+
+void crearTablaUsuario(sqlite3* db) {
+    char* sql = "CREATE TABLE IF NOT EXISTS Usuario (ID_Usuario TEXT, Nombre TEXT, Apellido TEXT, Correo TEXT, Contrasenya TEXT)";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+    
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        return;
+    }
+    
+    sqlite3_finalize(stmt);
+}
+
+void insertarUsuario(sqlite3* db, Usuario usuario) {
+// Preparar la consulta SQL para insertar un nuevo usuario
+    char* sql = "INSERT INTO Usuario (ID_Usuario, Nombre, Apellido, Correo, Contrasenya) VALUES (?, ?, ?, ?, ?)";
+
+    // Crear una declaración SQL
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    // Bindear los parámetros a la declaración SQL
+    sqlite3_bind_text(stmt, 1, usuario.ID_Usuario, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, usuario.nombreU, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, usuario.apellidoU, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, usuario.correo, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 5, usuario.contrasenya, -1, SQLITE_STATIC);
+
+
+
+    // Ejecutar la consulta
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        return;
+    }
+
+    // Finalizar la declaración
+    sqlite3_finalize(stmt);
+}

@@ -4,6 +4,7 @@
 #include "sqlite3.h"
 #include "database.h"
 #include "menu.h"
+#include <string.h>
 
 
 void agregarNuevoLibro(sqlite3* db) {
@@ -69,6 +70,91 @@ void ejecutarMenuLibros(sqlite3* db) {
     } while (opcion != 4);
 }
 
+// GESTION USUARIOS
+void agregarNuevoUsuario(sqlite3* db) {
+// Solicitar detalles del nuevo usuario
+    printf("Ingrese el ID del usuario: ");
+    char id[50];
+    scanf("%s", id);
+
+    printf("Ingrese el nombre del usuario: ");
+    char nombre[50];
+    scanf("%s", nombre);
+    printf("\n");
+
+    printf("Ingrese el apellido del usuario: ");
+    char apellido[50];
+    scanf("%s", apellido);
+    printf("\n");
+
+    printf("Ingrese el correo del usuario: ");
+    char correo[100];
+    scanf("%s", correo);
+    printf("\n");
+
+    printf("Ingrese la contraseña del usuario: ");
+    char contr[50];
+    scanf("%s", contr);
+    printf("\n");
+
+    // Crear una instancia de Usuario
+    Usuario nuevoUsuario;
+
+    // Asignar valores al usuario
+    strcpy(nuevoUsuario.ID_Usuario, id);
+    strcpy(nuevoUsuario.nombreU, nombre);
+    strcpy(nuevoUsuario.apellidoU, apellido);
+    strcpy(nuevoUsuario.correo, correo);
+    strcpy(nuevoUsuario.contrasenya, contr);
+
+
+    insertarUsuario(db, nuevoUsuario);
+    printf("El nuevo usuario ha sido agregado correctamente.\n");
+}
+
+void mostrarMenuUsuarios() {
+    printf("=== Menu de Gestion de Usuarios ===\n");
+    printf("1. Agregar Nuevo Usuario\n");
+    printf("2. Mostrar Todos los Usuarios\n");
+    printf("3. Buscar Usuario\n");
+    printf("4. Editar Usuario\n");
+    printf("5. Borrar Usuario\n");
+    printf("6. Volver al Menu Principal\n");
+    printf("Seleccione una opcion: ");
+}
+
+void ejecutarMenuUsuarios(sqlite3* db) {
+    int opcion;
+    do {
+        mostrarMenuUsuarios();
+        scanf("%d", &opcion);
+        switch (opcion) {
+            case 1:
+                agregarNuevoUsuario(db);
+                break;
+            case 2:
+                // Lógica para mostrar todos los usuarios
+                break;
+            case 3:
+                // Lógica para buscar un usuario
+                break;
+            case 4:
+                // Lógica para editar un usuario
+                break;
+            case 5:
+                // Lógica para eliminar un usuario
+                break;
+            case 6:
+                printf("Volviendo al Menu Principal...\n");
+                break;
+            default:
+                printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
+                break;
+        }
+    } while (opcion != 6);
+}
+
+
 void mostrarMenuPrincipal() {
     printf("=== Menu Principal ===\n");
     printf("1. Gestion de Libros\n");
@@ -90,7 +176,7 @@ void ejecutarMenuPrincipal(sqlite3* db) {
                 ejecutarMenuLibros(db);
                 break;
             case 2:
-                // Lógica para ejecutar el menú de gestión de usuarios
+                ejecutarMenuUsuarios(db);
                 break;
             case 3:
                 // Lógica para ejecutar el menú de gestión de préstamos
