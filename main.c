@@ -13,6 +13,9 @@ int main() {
     // Crear tabla de libros si no existe
     crearTablaLibro(db);
 
+    // Crear tabla usuario
+    crearTablaUsuario(db);
+
     // Ejecutar el menú principal
     ejecutarMenuPrincipal(db);
 
