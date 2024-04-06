@@ -379,12 +379,41 @@ void registrarDevolucion(sqlite3* db) {
     }
 }
 
+void buscarPrestamosPendientes(sqlite3* db) {
+    // Solicitar al usuario que ingrese el ID del usuario para buscar sus préstamos pendientes
+    char idUsuario[50];
+    printf("Ingrese el ID del usuario para buscar sus prestamos pendientes: ");
+    scanf("%s", idUsuario);
+
+    // Consultar la tabla Prestamo para obtener los préstamos pendientes del usuario especificado
+    char selectSql[200];
+    sprintf(selectSql, "SELECT ID_Libro, Fecha_Vencimiento FROM Prestamo WHERE ID_Usuario = '%s' AND Estado = 0", idUsuario);
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    // Mostrar los préstamos pendientes del usuario
+    printf("Prestamos pendientes del usuario %s:\n", idUsuario);
+    printf("ID_Libro\tFecha_Vencimiento\n");
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        const char* idLibro = (const char*)sqlite3_column_text(stmt, 0);
+        const char* fechaVencimiento = (const char*)sqlite3_column_text(stmt, 1);
+        printf("%s\t%s\n", idLibro, fechaVencimiento);
+    }
+
+    // Liberar la consulta preparada
+    sqlite3_finalize(stmt);
+}
+
 void mostrarMenuPrestamos() {
     printf("=== Menu de Gestion de Prestamos ===\n");
     printf("1. Agregar Nuevo Prestamo\n");
     printf("2. Renovar Prestamo Existente\n");
     printf("3. Registrar Devolucion de Libro\n");
-    printf("4. Gestionar Problemas de Prestamo\n");
+    printf("4. Buscar Prestamos Pendientes\n");
     printf("5. Volver al Menu Principal\n");
     printf("Seleccione una opcion: ");
 }
@@ -405,7 +434,7 @@ void ejecutarMenuPrestamos(sqlite3* db) {
                 registrarDevolucion(db);
                 break;
             case 4:
-                //gestionarProblemasPrestamo(db);
+                buscarPrestamosPendientes(db);
                 break;
             case 5:
                 printf("Volviendo al Menu Principal...\n");
