@@ -16,6 +16,9 @@ int main() {
     // Crear tabla usuario
     crearTablaUsuario(db);
 
+    //Crear tabla prestamo
+    crearTablaPrestamo(db);
+
     // Ejecutar el menú principal
     ejecutarMenuPrincipal(db);
 

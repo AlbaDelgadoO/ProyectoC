@@ -429,8 +429,23 @@ void editarUsuarioDB(sqlite3* db, char* id) {
 
 }
 
+//GESTION DE PRESTAMOS
+void crearTablaPrestamo(sqlite3* db) {
+    // Consulta SQL para crear la tabla Prestamo
+    const char* sql = "CREATE TABLE IF NOT EXISTS Prestamo ("
+                      "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
+                      "ID_Libro TEXT,"
+                      "ID_Usuario TEXT,"
+                      "Fecha_Vencimiento TEXT"
+                      ")";
 
-
+    // Ejecutar la consulta
+    char* errMsg = NULL;
+    sqlite3_exec(db, sql, NULL, 0, &errMsg);
+    if (errMsg != NULL) {
+        sqlite3_free(errMsg);
+    }
+}
 
 
 

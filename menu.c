@@ -192,9 +192,79 @@ void ejecutarMenuUsuarios(sqlite3* db) {
 
 // GESTION DE PRESTAMOS
 
-void agregarNuevoPrestamo(sqlite3* db) {
-    // Código para agregar un nuevo préstamo
+bool usuarioExiste(sqlite3* db, const char* idUsuario) {
+    // Consulta SQL para buscar el usuario por su ID
+    const char* sql = "SELECT COUNT(*) FROM Usuario WHERE ID_Usuario = ?";
+
+    // Preparar la consulta
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return false;
+    }
+
+    // Bind the user ID parameter
+    sqlite3_bind_text(stmt, 1, idUsuario, -1, SQLITE_STATIC);
+
+    // Ejecutar la consulta
+    int result = sqlite3_step(stmt);
+
+    // Verificar si se encontró un usuario
+    bool existe = false;
+    if (result == SQLITE_ROW) {
+        int count = sqlite3_column_int(stmt, 0);
+        existe = count > 0;
+    } else if (result != SQLITE_DONE) {
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+    }
+
+    // Finalizar la consulta
+    sqlite3_finalize(stmt);
+
+    return existe;
 }
+
+void agregarNuevoPrestamo(sqlite3* db) {
+    // Solicitar detalles del nuevo préstamo al usuario
+    printf("Ingrese el ID del libro: ");
+    char idLibro[15];
+    scanf("%14s", idLibro);
+
+    printf("Ingrese el ID del usuario: ");
+    char idUsuario[50];
+    scanf("%49s", idUsuario);
+
+    // Verificar si el usuario existe en la base de datos
+    if (!usuarioExiste(db, idUsuario)) {
+        printf("El usuario con el ID '%s' no existe en la base de datos.\n", idUsuario);
+        return;
+    }
+
+    printf("Ingrese la fecha de vencimiento (YYYY-MM-DD): ");
+    char fechaVencimiento[11];
+    scanf("%10s", fechaVencimiento);
+
+    // Insertar el nuevo préstamo en la base de datos
+    char* sql = "INSERT INTO Prestamo (ID_Libro, ID_Usuario, Fecha_Vencimiento) VALUES (?, ?, ?)";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, idLibro, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, idUsuario, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, fechaVencimiento, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+    } else {
+        printf("El nuevo prestamo ha sido agregado correctamente.\n");
+    }
+
+    sqlite3_finalize(stmt);
+}
+
 
 void buscarPrestamosPendientes(sqlite3* db) {
     // Código para buscar préstamos pendientes
