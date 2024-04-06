@@ -10,14 +10,33 @@
 void agregarNuevoLibro(sqlite3* db) {
     // Solicitar detalles del nuevo libro al usuario
     printf("Ingrese el ISBN del libro: ");
-    char isbn[50];
-    scanf("%s", isbn);
-    // Solicitar otros detalles como título, autor, etc.
+    char isbn[15];
+    scanf("%14s", isbn);
+
+    printf("Ingrese el titulo del libro: ");
+    char titulo[100];
+    scanf("%s", titulo);
+
+    printf("Ingrese el autor del libro: ");
+    char autor[100];
+    scanf("%s", autor);
+
+    printf("Ingrese el genero del libro: ");
+    char genero[100];
+    scanf("%s", genero);
+
+    printf("Ingrese el numero de ejemplares del libro: ");
+    int nEjemplares;
+    scanf("%i", &nEjemplares);
     // Asegúrate de manejar correctamente la entrada del usuario y validarla según sea necesario
 
     // Crear una instancia de Libro con los detalles ingresados por el usuario
     Libro nuevoLibro;
-    // Asigna los detalles a la estructura nuevoLibro
+    strcpy(nuevoLibro.isbn, isbn);
+    strcpy(nuevoLibro.titulo, titulo);
+    strcpy(nuevoLibro.autor, autor);
+    strcpy(nuevoLibro.genero, genero);
+    nuevoLibro.nEjemplares = nEjemplares;    
 
     // Insertar el nuevo libro en la base de datos
     insertarLibro(db, nuevoLibro);
@@ -32,7 +51,7 @@ void buscarLibro(sqlite3* db) {
     // Realizar la búsqueda en la base de datos
     printf("Buscando libros que coincidan con '%s'...\n", termino);
     // Llamar a la función para buscar libros en la base de datos
-    // Mostrar los resultados de la búsqueda
+    buscarLibroBD(db, termino);
     // Manejar el caso en que no se encuentren resultados
 }
 
@@ -55,10 +74,10 @@ void ejecutarMenuLibros(sqlite3* db) {
                 agregarNuevoLibro(db);
                 break;
             case 2:
-                // Lógica para mostrar todos los libros
+                leerLibros(db);
                 break;
             case 3:
-                // Lógica para buscar un libro
+                buscarLibro(db);
                 break;
             case 4:
                 printf("Volviendo al Menu Principal...\n");

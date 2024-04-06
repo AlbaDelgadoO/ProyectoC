@@ -4,9 +4,11 @@
 #include "sqlite3.h"
 
 typedef struct {
-    char isbn[20];
+    char isbn[14];
     char titulo[100];
     char autor[100];
+    char genero[100];
+    int nEjemplares;
 } Libro;
 
 typedef struct {
