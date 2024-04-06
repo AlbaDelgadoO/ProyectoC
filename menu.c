@@ -5,6 +5,7 @@
 #include "dataBase.h"
 #include "menu.h"
 #include <string.h>
+#include <time.h>
 
 void agregarNuevoLibro(sqlite3* db) {
     // Solicitar detalles del nuevo libro al usuario
@@ -265,6 +266,75 @@ void agregarNuevoPrestamo(sqlite3* db) {
     sqlite3_finalize(stmt);
 }
 
+// Función para obtener la nueva fecha de vencimiento extendida por 15 días
+char* calcularNuevaFechaVencimiento(const char* fechaVencimientoActual) {
+    struct tm *tm_fecha;
+    time_t tiempo;
+    
+    // Analiza la fecha de vencimiento actual desde la cadena
+    int year, month, day;
+    sscanf(fechaVencimientoActual, "%d-%d-%d", &year, &month, &day);
+    
+    // Obtiene el tiempo actual
+    tiempo = time(NULL);
+    tm_fecha = gmtime(&tiempo);
+    tm_fecha->tm_year = year - 1900; // Año desde 1900
+    tm_fecha->tm_mon = month - 1; // Mes (0-11)
+    tm_fecha->tm_mday = day; // Día del mes
+    
+    // Añade 15 días a la fecha de vencimiento actual
+    tiempo = mktime(tm_fecha) + (15 * 24 * 60 * 60); // 15 días en segundos
+    
+    // Convierte el tiempo en estructura tm
+    tm_fecha = gmtime(&tiempo);
+    
+    // Formatea la nueva fecha de vencimiento en una cadena
+    static char nuevaFecha[11];
+    snprintf(nuevaFecha, sizeof(nuevaFecha), "%04d-%02d-%02d", tm_fecha->tm_year + 1900, tm_fecha->tm_mon + 1, tm_fecha->tm_mday);
+
+    return nuevaFecha;
+}
+
+void renovarPrestamo(sqlite3* db) {
+    // Solicitar al usuario que ingrese el ID del préstamo que desea renovar
+    int idPrestamo;
+    printf("Ingrese el ID del préstamo que desea renovar: ");
+    scanf("%d", &idPrestamo);
+
+    // Consultar la fecha de vencimiento actual del préstamo
+    char selectSql[100];
+    sprintf(selectSql, "SELECT \"Fecha Vencimiento\" FROM Prestamo WHERE ID = %d", idPrestamo); // Cambio aquí
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    // Si el préstamo existe, actualizar la fecha de vencimiento
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        const char* fechaVencimientoActual = (const char*)sqlite3_column_text(stmt, 0);
+
+        // Calcular la nueva fecha de vencimiento extendida por 15 días
+        char* nuevaFechaVencimiento = calcularNuevaFechaVencimiento(fechaVencimientoActual);
+
+        // Actualizar la fecha de vencimiento en la base de datos
+        char updateSql[200];
+        sprintf(updateSql, "UPDATE Prestamo SET \"Fecha Vencimiento\" = '%s' WHERE ID = %d", nuevaFechaVencimiento, idPrestamo); // Cambio aquí
+        int updateResult = sqlite3_exec(db, updateSql, NULL, 0, NULL);
+        if (updateResult != SQLITE_OK) {
+            printf("Error al actualizar la fecha de vencimiento: %s\n", sqlite3_errmsg(db));
+            return;
+        }
+
+        printf("El prestamo ha sido renovado con éxito.\n");
+    } else {
+        printf("No se encontró un préstamo con el ID especificado.\n");
+    }
+
+    // Liberar la consulta preparada
+    sqlite3_finalize(stmt);
+}
 
 void buscarPrestamosPendientes(sqlite3* db) {
     // Código para buscar préstamos pendientes
@@ -290,7 +360,7 @@ void ejecutarMenuPrestamos(sqlite3* db) {
                 agregarNuevoPrestamo(db);
                 break;
             case 2:
-                //renovarPrestamo(db);
+                renovarPrestamo(db);
                 break;
             case 3:
                 //registrarDevolucion(db);
