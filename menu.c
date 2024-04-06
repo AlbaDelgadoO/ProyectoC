@@ -296,14 +296,14 @@ char* calcularNuevaFechaVencimiento(const char* fechaVencimientoActual) {
 }
 
 void renovarPrestamo(sqlite3* db) {
-    // Solicitar al usuario que ingrese el ID del préstamo que desea renovar
-    int idPrestamo;
-    printf("Ingrese el ID del prestamo que desea renovar: ");
-    scanf("%d", &idPrestamo);
+    // Solicitar el ID del libro
+    printf("Ingrese el ID del libro cuyo prestamo desea renovar: ");
+    int idLibro;
+    scanf("%d", &idLibro);
 
-    // Consultar la fecha de vencimiento actual del préstamo
-    char selectSql[100];
-    sprintf(selectSql, "SELECT Fecha_Vencimiento FROM Prestamo WHERE ID = %d", idPrestamo);
+    // Consultar la fecha de vencimiento actual del préstamo asociado al libro
+    char selectSql[200];
+    sprintf(selectSql, "SELECT Fecha_Vencimiento FROM Prestamo WHERE ID_Libro = %d", idLibro);
     sqlite3_stmt* stmt;
     int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -311,7 +311,7 @@ void renovarPrestamo(sqlite3* db) {
         return;
     }
 
-    // Si el préstamo existe, actualizar la fecha de vencimiento
+    // Si existe un préstamo asociado al libro, actualizar la fecha de vencimiento
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         const char* fechaVencimientoActual = (const char*)sqlite3_column_text(stmt, 0);
 
@@ -320,24 +320,20 @@ void renovarPrestamo(sqlite3* db) {
 
         // Actualizar la fecha de vencimiento en la base de datos
         char updateSql[200];
-        sprintf(updateSql, "UPDATE Prestamo SET Fecha_Vencimiento = '%s' WHERE ID = %d", nuevaFechaVencimiento, idPrestamo);
+        sprintf(updateSql, "UPDATE Prestamo SET Fecha_Vencimiento = '%s' WHERE ID_Libro = %d", nuevaFechaVencimiento, idLibro);
         int updateResult = sqlite3_exec(db, updateSql, NULL, 0, NULL);
         if (updateResult != SQLITE_OK) {
             printf("Error al actualizar la fecha de vencimiento: %s\n", sqlite3_errmsg(db));
             return;
         }
 
-        printf("El prestamo ha sido renovado con exito.\n");
+        printf("El prestamo del libro con ID %d ha sido renovado con exito.\n", idLibro);
     } else {
-        printf("No se encontro un prestamo con el ID especificado.\n");
+        printf("No se encontro un prestamo asociado al libro con ID %d.\n", idLibro);
     }
 
     // Liberar la consulta preparada
     sqlite3_finalize(stmt);
-}
-
-void buscarPrestamosPendientes(sqlite3* db) {
-    // Código para buscar préstamos pendientes
 }
 
 void mostrarMenuPrestamos() {
