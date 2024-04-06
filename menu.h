@@ -16,4 +16,11 @@ void editarUsuario(sqlite3* db);
 void mostrarMenuUsuarios();
 void ejecutarMenuUsuarios(sqlite3* db);
 
+// CONFIGURACIÓN DEL SISTEMA
+void mostraMenuConfiguracionPoliticas();
+void ejecutarMenuConfiguracionPoliticas(sqlite3* db);
+void mostrarMenuConfiguracion();
+void ejecutarMenuConfiguracion(sqlite3* db);
+
+
 #endif /* MENU_H */

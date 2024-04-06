@@ -446,6 +446,71 @@ void ejecutarMenuPrestamos(sqlite3* db) {
     } while (opcion != 5);
 }
 
+//CONFIGURACION DEL SISTEMA 
+void mostrarMenuConfiguracionPoliticas(){
+    printf("=== Configuración de Politicas de Prestamo ===\n");
+    printf("1. Configurar duración máxima de prestamo \n");
+    printf("2. Configurar cantidad maxima de libros prestados\n ");
+    printf("3. Configurar multa por devolución tardía\n");
+    printf("4. Volver al Menu de Configuración del Sistema ");
+    printf("Seleccione una opción: ");
+
+}
+
+void ejecutarMenuConfiguracionPoliticas(sqlite3* db){
+    int opcion;
+     do{
+        mostrarMenuConfiguracionPoliticas();
+        scanf("%d", &opcion);
+        switch (opcion){
+        case 1:
+            /* code */
+            break;
+        case 2: 
+            break;
+        case 3:
+            break;
+        case 4: 
+            printf("Volviendo al Menu Principal...\n");
+            break;
+        default:
+            printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
+            break;
+        }
+    } while (opcion != 4);
+    
+}
+
+void mostrarMenuConfiguracion(){
+    printf("=== Configuracion Del Sistema ===\n");
+    printf("1. Politica de Prestamos\n");
+    printf("2. Volver al Menu Principal\n");
+    printf("3. Salir\n");
+    printf("Selccione una opción: ");
+
+}
+
+void ejecutarMenuConfiguracion(sqlite3* db){
+    int opcion; 
+    do{
+        mostrarMenuConfiguracion();
+        scanf("%d", &opcion);
+        switch (opcion){
+        case 1:
+            ejecutarMenuConfiguracionPoliticas(db);
+            break;
+        case 2: 
+            break;
+        case 3:
+            printf("Volviendo al Menu Principal...\n");
+            break;
+        default:
+            printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
+            break;
+        }
+    } while (opcion != 3);
+}
+
 void mostrarMenuPrincipal() {
     printf("=== Menu Principal ===\n");
     printf("1. Gestion de Libros\n");
@@ -473,7 +538,7 @@ void ejecutarMenuPrincipal(sqlite3* db) {
                 ejecutarMenuPrestamos(db);
                 break;
             case 4:
-                // Lógica para ejecutar el menú de configuración del sistema
+                ejecutarMenuConfiguracion(db);
                 break;
             case 5:
                 // Lógica para ejecutar el menú de generación de informes
@@ -487,3 +552,8 @@ void ejecutarMenuPrincipal(sqlite3* db) {
         }
     } while (opcion != 6);
 }
+
+
+
+
+       
