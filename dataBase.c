@@ -436,7 +436,8 @@ void crearTablaPrestamo(sqlite3* db) {
                       "ID INTEGER PRIMARY KEY AUTOINCREMENT,"
                       "ID_Libro TEXT,"
                       "ID_Usuario TEXT,"
-                      "Fecha_Vencimiento TEXT"
+                      "Fecha_Vencimiento TEXT,"
+                      "Estado INTEGER DEFAULT 0" //0 indica que el préstamo está pendiente y 1 indica que el préstamo ha sido devuelto
                       ")";
 
     // Ejecutar la consulta
@@ -446,6 +447,3 @@ void crearTablaPrestamo(sqlite3* db) {
         sqlite3_free(errMsg);
     }
 }
-
-
-

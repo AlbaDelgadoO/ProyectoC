@@ -336,6 +336,49 @@ void renovarPrestamo(sqlite3* db) {
     sqlite3_finalize(stmt);
 }
 
+void registrarDevolucion(sqlite3* db) {
+    // Solicitar al usuario que ingrese el ID del libro devuelto
+    int idLibro;
+    printf("Ingrese el ID del libro a devolver: ");
+    scanf("%d", &idLibro);
+
+    // Consultar la tabla Prestamo para verificar si hay préstamos activos para este libro
+    char selectSql[100];
+    sprintf(selectSql, "SELECT ID FROM Prestamo WHERE ID_Libro = %d AND Estado = 0", idLibro);
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    // Ejecutar la consulta y verificar si hay resultados
+    bool prestamosActivos = false;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        prestamosActivos = true;
+        int idPrestamo = sqlite3_column_int(stmt, 0);
+
+        // Actualizar el estado del préstamo a devuelto (Estado = 1)
+        char updateSql[100];
+        sprintf(updateSql, "UPDATE Prestamo SET Estado = 1 WHERE ID = %d", idPrestamo);
+        int updateResult = sqlite3_exec(db, updateSql, NULL, 0, NULL);
+        if (updateResult != SQLITE_OK) {
+            printf("Error al actualizar el estado del prestamo: %s\n", sqlite3_errmsg(db));
+            return;
+        }
+    }
+
+    // Liberar la consulta preparada
+    sqlite3_finalize(stmt);
+
+    // Verificar si se encontraron préstamos activos para este libro
+    if (prestamosActivos) {
+        printf("El libro ha sido devuelto con exito.\n");
+    } else {
+        printf("No hay prestamos pendientes para este libro.\n");
+    }
+}
+
 void mostrarMenuPrestamos() {
     printf("=== Menu de Gestion de Prestamos ===\n");
     printf("1. Agregar Nuevo Prestamo\n");
@@ -359,7 +402,7 @@ void ejecutarMenuPrestamos(sqlite3* db) {
                 renovarPrestamo(db);
                 break;
             case 3:
-                //registrarDevolucion(db);
+                registrarDevolucion(db);
                 break;
             case 4:
                 //gestionarProblemasPrestamo(db);
