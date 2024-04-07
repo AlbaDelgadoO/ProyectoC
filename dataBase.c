@@ -3,6 +3,7 @@
 #include "sqlite3.h"
 #include "dataBase.h"
 #include <string.h>
+#include "menu.h"
 
 // Implementación de las funciones para interactuar con la base de datos
 sqlite3* inicializarBaseDatos(const char* nombreArchivo) {
@@ -246,7 +247,8 @@ void modificarContra(sqlite3* db, char* contraNueva, char* id) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     } 
     sqlite3_finalize(stmt);
-    printf("Usuario modificado con exito. Pulse 6 para salir.");
+    printf("Usuario modificado con \n");
+    ejecutarMenuUsuarios(db);
 }
 
 void modificarCorreo(sqlite3* db, char* correoNuevo, char* id) {
@@ -265,8 +267,9 @@ void modificarCorreo(sqlite3* db, char* correoNuevo, char* id) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     } 
     sqlite3_finalize(stmt);
-    printf("Usuario modificado con exito. Pulse 6 para salir.");
-}
+    printf("Usuario modificado con \n");
+    ejecutarMenuUsuarios(db);
+    }
 
 void modificarApellido(sqlite3* db, char* apellidoNuevo, char* id) {
     char* sql = "UPDATE Usuario SET Apellido = ? WHERE ID_Usuario = ?";
@@ -284,8 +287,9 @@ void modificarApellido(sqlite3* db, char* apellidoNuevo, char* id) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     } 
     sqlite3_finalize(stmt);
-    printf("Usuario modificado con exito. Pulse 6 para salir.");
-}
+    printf("Usuario modificado con \n");
+    ejecutarMenuUsuarios(db);
+    }
 
 
 void modificarNombre(sqlite3* db, char* nombreNuevo, char* id) {
@@ -304,8 +308,9 @@ void modificarNombre(sqlite3* db, char* nombreNuevo, char* id) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     } 
     sqlite3_finalize(stmt);
-    printf("Usuario modificado con exito. Pulse 6 para salir.");
-}
+    printf("Usuario modificado con \n");
+    ejecutarMenuUsuarios(db);
+    }
 
 
 
@@ -326,9 +331,9 @@ void modificarID(sqlite3* db, char* idNueva, char* idAntigua) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     } 
 
-    sqlite3_finalize(stmt);            
-    printf("Usuario modificado con exito. Pulse 6 para salir.");
-
+    sqlite3_finalize(stmt);   
+    printf("Usuario modificado con \n");
+    ejecutarMenuUsuarios(db);
 }
 
 void mostrarMenuEdicion() {
@@ -427,6 +432,28 @@ void editarUsuarioDB(sqlite3* db, char* id) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     }
 
+}
+
+void borrarUsuarioDB(sqlite3 *db, char* id) {
+    char* sql = "DELETE FROM Usuario WHERE ID_Usuario = ?";
+    sqlite3_stmt* stmt;
+
+     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    // Bindear parametros
+    sqlite3_bind_text(stmt, 1, id, -1, SQLITE_STATIC);
+    
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+    } 
+
+    sqlite3_finalize(stmt);            
+    printf("Usuario eliminado con exito.\n");
+    printf("\n");
 }
 
 //GESTION DE PRESTAMOS

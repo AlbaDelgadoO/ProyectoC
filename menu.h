@@ -13,6 +13,7 @@ void buscarLibro(sqlite3* db);
 void agregarNuevoUsuario(sqlite3* db);
 void buscarUsuario(sqlite3* db);
 void editarUsuario(sqlite3* db);
+void borrarUsuario(sqlite3* db);
 void mostrarMenuUsuarios();
 void ejecutarMenuUsuarios(sqlite3* db);
 
