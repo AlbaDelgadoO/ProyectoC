@@ -19,6 +19,14 @@ typedef struct {
     char contrasenya[50];
 } Usuario;
 
+
+typedef struct{
+   char nombre[20];
+   char apellido[20];
+   char nacionalidad[100];
+}Autor;
+
+
 sqlite3* inicializarBaseDatos(const char* nombreArchivo);
 void crearTablaLibro(sqlite3* db);
 void insertarLibro(sqlite3* db, Libro libro);
@@ -39,5 +47,12 @@ void mostrarMenuEdicion();
 void ejecutarMenuEdicion(sqlite3* db, char* id);
 void editarUsuarioDB(sqlite3* db, char* id);
 void crearTablaPrestamo(sqlite3* db);
+
+//AUTOR
+void insertarAutor(sqlite3*db, Autor autor);
+void leerAutores(sqlite3* db);
+void eliminarAutores(sqlite3* db, const char* nombreAutor);
+void buscarAutor(sqlite3* db, const char* termino);
+void crearTablaAutor(sqlite3* db);
 
 #endif /* DATABASE_H */

@@ -17,7 +17,7 @@ sqlite3* inicializarBaseDatos(const char* nombreArchivo) {
 }
 
 void crearTablaLibro(sqlite3* db){
-    char* sql = "CREATE TABLE IF NOT EXISTS Libro (ISBN TEXT, Titulo TEXT, Autor TEXT, Genero TEXT, nEjemplares INTEGER)";
+    char* sql = "CREATE TABLE IF NOT EXISTS Libro (ISBN TEXT, Titulo TEXT, Autor TEXT REFERENCES Autor(Nombre), Genero TEXT, nEjemplares INTEGER)";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
@@ -447,3 +447,112 @@ void crearTablaPrestamo(sqlite3* db) {
         sqlite3_free(errMsg);
     }
 }
+
+//TABLA AUTOR
+void crearTablaAutor(sqlite3* db){
+    char* sql = "CREATE TABLE IF NOT EXISTS Autor(Nombre TEXT, Apellido TEXT, Nacionalidad TEXT)";
+    sqlite3_stmt* stmt;
+
+    if(sqlite3_prepare_v2(db, sql, -1, &stmt, NULL)!= SQLITE_OK){
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    if(sqlite3_step(stmt) !=SQLITE_DONE){
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        return;
+    }
+}
+
+void insertarAutor(sqlite3*db, Autor autor){
+    char*sql= "INSERT INTO Autor(Nombre,Apellido,Naccionalidad)VALUES(?,?,?)";
+    sqlite3_stmt* stmt;
+    if(sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK){
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, autor.nombre, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, autor.apellido, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, autor.nacionalidad, -1, SQLITE_STATIC);
+
+    if(sqlite3_step(stmt) !=SQLITE_DONE){
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        return;
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+void leerAutores(sqlite3* db){
+    char* sql = "SELECT * FROM Autor";
+    sqlite3_stmt* stmt;
+
+    if(sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK){
+        fprintf(stderr, "Error al preparar las consultas: %a\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    printf("=== LISTA DE AUTORES === \n");
+    printf("%-20s %-20s %20s\n", "Nombre", "Apellido", "Nacionalidad");
+    printf("=====================================================================\n");
+    while(sqlite3_step(stmt) == SQLITE_ROW){
+        const unsigned char* nombre = sqlite3_column_text(stmt, 0);
+        const unsigned char* apellido =sqlite3_column_text(stmt, 1);
+        const unsigned char* nacionalidad = sqlite3_column_text(stmt, 2);
+        printf("Nombre: %s, Apelliddo: %s, Nacionalidad: %s\n", nombre, apellido, nacionalidad);
+    }
+    printf("\n");
+
+    sqlite3_finalize(stmt);
+}
+
+void eliminarAutores(sqlite3* db, const char* nombreAutor){
+    char* sql = "DELETE FROM Autor WHERE Nombre = ?";
+    sqlite3_stmt* stmt;
+
+    if(sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) !=SQLITE_OK){
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, nombreAutor, -1, SQLITE_STATIC);
+
+    if(sqlite3_step(stmt) != SQLITE_DONE){
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+    }else{
+        printf("Autor eliminado correctamente \n");
+    }
+
+     sqlite3_finalize(stmt);
+    
+}
+
+void buscarAutor(sqlite3* db, const char* termino){
+    char* sql= "SELECT * FROM Autor";
+    sqlite3_stmt* stmt;
+
+    if(sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) !=SQLITE_OK){
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, termino, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, termino, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, termino, -1, SQLITE_STATIC);
+
+    printf("=== Resultados de la búsqueda ===\n");
+    while(sqlite3_step(stmt) == SQLITE_ROW){
+        const unsigned char* nombre = sqlite3_column_text(stmt, 0);
+        const unsigned char* apellido = sqlite3_column_text(stmt, 1);
+        const unsigned char* nacionalidad = sqlite3_column_text(stmt, 2);
+        printf("Nombre: %s, Apellido: %s, Nacionalidad %s\n", nombre, apellido, nacionalidad);
+    }
+
+    sqlite3_finalize(stmt);
+    
+
+}
+

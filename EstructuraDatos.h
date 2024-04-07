@@ -39,4 +39,11 @@ typedef struct {
     int ID_Usuario;
 } Prestamo;
 
+//Estructura para representar un Autor
+typedef struct{
+   char nombre[20];
+   char apellido[20];
+   char nacionalidad[100];
+}Autor;
+
 #endif /* ESTRUCTURA_DATOS_H */
