@@ -247,7 +247,7 @@ void modificarContra(sqlite3* db, char* contraNueva, char* id) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     } 
     sqlite3_finalize(stmt);
-    printf("Usuario modificado con \n");
+    printf("Usuario modificado con exito\n");
     ejecutarMenuUsuarios(db);
 }
 
@@ -267,7 +267,7 @@ void modificarCorreo(sqlite3* db, char* correoNuevo, char* id) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     } 
     sqlite3_finalize(stmt);
-    printf("Usuario modificado con \n");
+    printf("Usuario modificado con exito\n");
     ejecutarMenuUsuarios(db);
     }
 
@@ -287,7 +287,7 @@ void modificarApellido(sqlite3* db, char* apellidoNuevo, char* id) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     } 
     sqlite3_finalize(stmt);
-    printf("Usuario modificado con \n");
+    printf("Usuario modificado con exito\n");
     ejecutarMenuUsuarios(db);
     }
 
@@ -308,7 +308,7 @@ void modificarNombre(sqlite3* db, char* nombreNuevo, char* id) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     } 
     sqlite3_finalize(stmt);
-    printf("Usuario modificado con \n");
+    printf("Usuario modificado con exito\n");
     ejecutarMenuUsuarios(db);
     }
 
@@ -332,7 +332,7 @@ void modificarID(sqlite3* db, char* idNueva, char* idAntigua) {
     } 
 
     sqlite3_finalize(stmt);   
-    printf("Usuario modificado con \n");
+    printf("Usuario modificado con exito\n");
     ejecutarMenuUsuarios(db);
 }
 
