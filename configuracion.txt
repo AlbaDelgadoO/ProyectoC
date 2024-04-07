@@ -1,0 +1,12 @@
+
+Configuracion del Sistema
+
+# Ruta de la base de datos
+RutaBaseDatos = biblioteca.db
+
+#Ficheros y Rutas
+RutaArchivoLog = registro.log
+RutaArchivoConfiguracion = configuracion.txt
+
+
+

@@ -18,10 +18,11 @@ void mostrarMenuUsuarios();
 void ejecutarMenuUsuarios(sqlite3* db);
 
 // CONFIGURACIÓN DEL SISTEMA
-void mostrarMenuConfiguracionPoliticasPrestamo();
-void ejecutarMenuConfiguracionPoliticasPrestamo(sqlite3* db);
-void mostrarMenuConfiguracionPoliticasLibros();
-void ejecutarMenuConfiguracionPoliticasLibro(sqlite3* db);
+void crearFicheroLog();
+void leerFicheroConfiguracion();
+void mostrarMenuConfiguracionFicheros();
+void mostrarMenuConfiguracionParametros();
+void ejecutarMenuConfiguracionParametros(sqlite3* db);
 void mostrarMenuConfiguracion();
 void ejecutarMenuConfiguracion(sqlite3* db);
 

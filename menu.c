@@ -456,20 +456,75 @@ void ejecutarMenuPrestamos(sqlite3* db) {
 }
 
 //CONFIGURACION DEL SISTEMA 
-void mostrarMenuConfiguracionPoliticasPrestamo(){
-    printf("=== Configuracion de Politicas de Prestamo ===\n");
+
+void crearFicheroLog(){
+    FILE* archivoLog = fopen("registro.log", "w");
+    if(archivoLog == NULL){
+        printf("Error al crear el archivo de resgistro\n");
+        return;
+    }
+    fprintf(archivoLog, "Inicio del registro...\n");
+    fclose(archivoLog);
+    printf("Archivo de resgistro creado correctamente\n");
+    
+}
+
+void leerFicheroConfiguracion(){
+    FILE*archivo;
+    char linea[100];
+
+    archivo= fopen("configuracion.txt", "r");
+    if(archivo== NULL){
+        printf("No se puedo encontrar el archivo\n");
+        return;
+    }
+
+    printf("=== FICHERO DE CONFIGURACION ===\n");
+    while(fgets(linea, sizeof(linea), archivo) !=NULL){
+        printf("%s", linea);
+    };
+    fclose(archivo);
+}
+
+void mostrarMenuConfiguracionFicheros(){
+    printf("=== Fichero de configuracion ===\n");
+    printf("1. Leer Fichero \n");
+    printf("2. Modificar Fichero\n");
+    printf("3. Volver al Menu de Configuracion del Sistema\n");
+    printf("Seleccione una opcion: \n");
+}
+
+void ejecutarMenuConfiguracionFicheros(sqlite3*db){
+    int opcion;
+    do{
+        mostrarMenuConfiguracionFicheros();
+        scanf("%d", &opcion);
+        switch(opcion){
+            case 1:
+                leerFicheroConfiguracion();
+            case 2:
+                break;
+            default:
+                printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
+                break;
+            
+        }
+    }while (opcion !=3);
+}
+void mostrarMenuConfiguracionParametros(){
+    printf("=== Configuracion de Variables y Parametros del Sistema ===\n");
     printf("1. Configurar duracion maxima de prestamo \n");
     printf("2. Configurar cantidad maxima de libros prestados\n");
     printf("3. Configurar multa por devolucion tardia\n");
     printf("4. Volver al Menu de Configuracion del Sistema \n");
-    printf("Seleccione una opcion: ");
+    printf("Seleccione una opcion: \n");
 
 }
 
-void ejecutarMenuConfiguracionPoliticasPrestamo(sqlite3* db){
+void ejecutarMenuConfiguracionParametros(sqlite3* db){
     int opcion;
      do{
-        mostrarMenuConfiguracionPoliticasPrestamo();
+       mostrarMenuConfiguracionParametros();
         scanf("%d", &opcion);
         switch (opcion){
         case 1:
@@ -489,47 +544,12 @@ void ejecutarMenuConfiguracionPoliticasPrestamo(sqlite3* db){
     } while (opcion != 4);
     
 }
-//Menu Configuracion Politicas  Libros
-void mostrarMenuConfiguracionPoliticasLibros(){
-    printf("=== Configuracion de Politicas de  Libro ===\n");
-    printf("1. Configurar número maximo de ejemplares para prestamo\n");
-    printf("2. Configurar restricción de ejemplares para ciertos usuarios\n");
-    printf("3. Volver al Menu de Configuracion del Sistema \n");
-    printf("Seleccione una opcion: ");
-
-}
-
-void ejecutarMenuConfiguracionPoliticasLibro(sqlite3* db){
-    int opcion;
-     do{
-        mostrarMenuConfiguracionPoliticasLibros();
-        scanf("%d", &opcion);
-        switch (opcion){
-        case 1:
-            break;
-        case 2: 
-            break;
-        case 3: 
-            printf("Volviendo al Menu de Configuracion del Sistema...\n");
-            break;
-        default:
-            printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
-            break;
-        }
-    } while (opcion != 3);
-    
-}
-
-
-
-
 
 void mostrarMenuConfiguracion(){
     printf("=== Configuracion Del Sistema ===\n");
-    printf("1. Configuracion de Politica de Prestamo\n");
-    printf("2. Configuracion de Politicas de Libro\n");
-    printf("3. Configuracion de Politica de Usuario\n");
-    printf("4. Volver al Menu Principal\n");
+    printf("1. Fichero de Configuracion\n");
+    printf("2. Parametros del Sistema\n");
+    printf("3. Volver al Menu Principal\n");
     printf("Selccione una opcion: ");
 
 }
@@ -541,20 +561,19 @@ void ejecutarMenuConfiguracion(sqlite3* db){
         scanf("%d", &opcion);
         switch (opcion){
         case 1:
-            ejecutarMenuConfiguracionPoliticasPrestamo(db);
+            ejecutarMenuConfiguracionFicheros(db);
             break;
         case 2: 
-            ejecutarMenuConfiguracionPoliticasLibro(db);
-        case 3:
+            ejecutarMenuConfiguracionParametros(db);
             break;
-        case 4: 
+        case 3:
             printf("Volviendo al Menu Principal...\n");
             break;
         default:
             printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
             break;
         }
-    } while (opcion != 4);
+    } while (opcion != 3);
 }
 
 void mostrarMenuPrincipal() {

@@ -19,8 +19,14 @@ int main() {
     //Crear tabla prestamo
     crearTablaPrestamo(db);
 
+    // Crear tabla Autor
+    crearTablaAutor(db);
+
     // Ejecutar el menú principal
     ejecutarMenuPrincipal(db);
+
+    //CREAR  EL FICHERO LOG 
+    crearFicheroLog();
 
     // Cerrar la base de datos
     sqlite3_close(db);
