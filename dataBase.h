@@ -46,6 +46,7 @@ void modificarID(sqlite3* db, char* idNueva, char* idAntigua);
 void mostrarMenuEdicion();
 void ejecutarMenuEdicion(sqlite3* db, char* id);
 void editarUsuarioDB(sqlite3* db, char* id);
+void borrarUsuarioDB(sqlite3 *db, char* id);
 void crearTablaPrestamo(sqlite3* db);
 
 //AUTOR

@@ -96,6 +96,7 @@ void agregarNuevoUsuario(sqlite3* db) {
     printf("Ingrese el ID del usuario: ");
     char id[50];
     scanf("%s", id);
+    printf("\n");
 
     printf("Ingrese el nombre del usuario: ");
     char nombre[50];
@@ -148,6 +149,14 @@ void editarUsuario(sqlite3* db){
     editarUsuarioDB(db, id);
 }
 
+void borrarUsuario(sqlite3* db) {
+    printf("Introduce el ID del usuario que deseas borrar: ");
+    char id[50];
+    scanf("%s", id);
+
+    borrarUsuarioDB(db, id);
+}
+
 
 void mostrarMenuUsuarios() {
     printf("=== Menu de Gestion de Usuarios ===\n");
@@ -179,7 +188,7 @@ void ejecutarMenuUsuarios(sqlite3* db) {
                 editarUsuario(db);
                 break;
             case 5:
-                // Lógica para eliminar un usuario
+                borrarUsuario(db);
                 break;
             case 6:
                 printf("Volviendo al Menu Principal...\n");
