@@ -42,20 +42,20 @@ void generarInformeLibros(sqlite3* db);
 
 GENERACION DE INFORMES
 
-USUARIOS
+USUARIOS:
 
 Usuario que no haya realizado ningun prestamo
 Usuario con mas prestamo
 Numero de usuarios registrado
 
-PRESTAMOS
+PRESTAMOS:
 
 Numero de veces que se ha prestado un libro
 Numero de prestamos activos
 Libro mas prestado
 Libro menos prestado
 
-LIBROS
+LIBROS:
 
 Numero de libros que no sa han prestado
 Numero de libros prestados
