@@ -10,6 +10,7 @@ int main() {
     // Inicializar la base de datos
     db = inicializarBaseDatos("biblioteca.db");
 
+
     // Crear tabla de libros si no existe
     crearTablaLibro(db);
 
