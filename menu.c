@@ -11,36 +11,50 @@ void agregarNuevoLibro(sqlite3* db) {
     // Solicitar detalles del nuevo libro al usuario
     printf("Ingrese el ISBN del libro: ");
     char isbn[15];
-    scanf("%14s", isbn);
+    scanf(" %[^\n]", isbn);
 
     printf("Ingrese el titulo del libro: ");
     char titulo[100];
-    scanf("%s", titulo);
-
-    printf("Ingrese el autor del libro: ");
-    char autor[100];
-    scanf("%s", autor);
+    scanf(" %[^\n]", titulo);
 
     printf("Ingrese el genero del libro: ");
     char genero[100];
-    scanf("%s", genero);
+    scanf(" %[^\n]", genero);
+
+    printf("Ingrese el nombre del autor: ");
+    char autor[100];
+    scanf(" %[^\n]", autor);
+
+    printf("Ingrese el apellido del autor: ");
+    char apellido[100];
+    scanf(" %[^\n]", apellido);
 
     printf("Ingrese el numero de ejemplares del libro: ");
     int nEjemplares;
     scanf("%i", &nEjemplares);
-    // Asegúrate de manejar correctamente la entrada del usuario y validarla según sea necesario
 
+    printf("Ingrese el año de publicacion del libro: ");
+    int aPubl;
+    scanf("%i", &aPubl);
+
+    printf("Ingrese el codigo de editorial del libro: ");
+    int cod_E;
+    scanf("%i", &cod_E);
+
+    
     // Crear una instancia de Libro con los detalles ingresados por el usuario
     Libro nuevoLibro;
-    strcpy(nuevoLibro.isbn, isbn);
+    strcpy(nuevoLibro.ISBN, isbn);
     strcpy(nuevoLibro.titulo, titulo);
-    strcpy(nuevoLibro.autor, autor);
     strcpy(nuevoLibro.genero, genero);
-    nuevoLibro.nEjemplares = nEjemplares;    
+    strcpy(nuevoLibro.nom_autor, autor);
+    strcpy(nuevoLibro.apellido_autor, apellido);
+    nuevoLibro.numEjemplares = nEjemplares;
+    nuevoLibro.anyoPublicacion = aPubl;
+    nuevoLibro.cod_Editorial = cod_E;
 
     // Insertar el nuevo libro en la base de datos
     insertarLibro(db, nuevoLibro);
-    printf("El nuevo libro ha sido agregado correctamente.\n");
 }
 
 void buscarLibro(sqlite3* db) {
@@ -96,27 +110,22 @@ void agregarNuevoUsuario(sqlite3* db) {
     printf("Ingrese el ID del usuario: ");
     char id[50];
     scanf("%s", id);
-    printf("\n");
 
     printf("Ingrese el nombre del usuario: ");
     char nombre[50];
     scanf("%s", nombre);
-    printf("\n");
 
     printf("Ingrese el apellido del usuario: ");
     char apellido[50];
     scanf("%s", apellido);
-    printf("\n");
 
     printf("Ingrese el correo del usuario: ");
     char correo[100];
     scanf("%s", correo);
-    printf("\n");
 
     printf("Ingrese la contraseña del usuario: ");
     char contr[50];
     scanf("%s", contr);
-    printf("\n");
 
     // Crear una instancia de Usuario
     Usuario nuevoUsuario;
@@ -236,7 +245,7 @@ bool usuarioExiste(sqlite3* db, const char* idUsuario) {
 
 void agregarNuevoPrestamo(sqlite3* db) {
     // Solicitar detalles del nuevo préstamo al usuario
-    printf("Ingrese el ID del libro: ");
+    printf("Ingrese el ISBN del libro: ");
     char idLibro[15];
     scanf("%14s", idLibro);
 
@@ -255,7 +264,7 @@ void agregarNuevoPrestamo(sqlite3* db) {
     scanf("%10s", fechaVencimiento);
 
     // Insertar el nuevo préstamo en la base de datos
-    char* sql = "INSERT INTO Prestamo (ID_Libro, ID_Usuario, Fecha_Vencimiento) VALUES (?, ?, ?)";
+    char* sql = "INSERT INTO Prestamo (ISBN_Libro, ID_Usuario, Fecha_Vencimiento) VALUES (?, ?, ?)";
     sqlite3_stmt* stmt;
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
@@ -268,6 +277,8 @@ void agregarNuevoPrestamo(sqlite3* db) {
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+        printf("Por favor, revise que el ISBN introducido es válido\n");
+
     } else {
         printf("El nuevo prestamo ha sido agregado correctamente.\n");
     }

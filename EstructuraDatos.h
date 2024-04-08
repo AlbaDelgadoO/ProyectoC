@@ -6,9 +6,10 @@ typedef struct {
     char ISBN[13];
     char titulo[100];
     char genero[50];
+    char nom_autor[50];
+    char apellido_autor[50];
     int numEjemplares;
-    int añoPublicacion;
-    int cod_Autor;
+    int anyoPublicacion;
     int cod_Editorial;
 } Libro;
 
@@ -17,16 +18,15 @@ typedef struct {
     int ID_Autor;
     char nombreA[50];
     char apellidoA[50];
-    char nacionalidad[50];
 } Autor;
 
 // Estructura para representar un usuario
 typedef struct {
-    int ID_Usuario;
+    char ID_Usuario[50];
     char nombreU[50];
     char apellidoU[50];
     char correo[100];
-    char contraseña[50];
+    char contrasenya[50];
 } Usuario;
 
 // Estructura para representar un préstamo
@@ -39,11 +39,5 @@ typedef struct {
     int ID_Usuario;
 } Prestamo;
 
-//Estructura para representar un Autor
-typedef struct{
-   char nombre[20];
-   char apellido[20];
-   char nacionalidad[100];
-}Autor;
 
 #endif /* ESTRUCTURA_DATOS_H */

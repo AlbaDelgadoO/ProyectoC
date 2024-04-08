@@ -1,35 +1,13 @@
 #ifndef DATABASE_H
 #define DATABASE_H
-
+#include "EstructuraDatos.h"
 #include "sqlite3.h"
-
-typedef struct {
-    char isbn[14];
-    char titulo[100];
-    char autor[100];
-    char genero[100];
-    int nEjemplares;
-} Libro;
-
-typedef struct {
-    char ID_Usuario[50];
-    char nombreU[50];
-    char apellidoU[50];
-    char correo[100];
-    char contrasenya[50];
-} Usuario;
-
-
-typedef struct{
-   char nombre[20];
-   char apellido[20];
-   char nacionalidad[100];
-}Autor;
 
 
 sqlite3* inicializarBaseDatos(const char* nombreArchivo);
 void crearTablaLibro(sqlite3* db);
 void insertarLibro(sqlite3* db, Libro libro);
+void comprobarAutor(sqlite3* db, Libro libro);
 void leerLibros(sqlite3* db);
 void buscarLibroBD(sqlite3* db, const char* termino);
 
@@ -50,10 +28,14 @@ void borrarUsuarioDB(sqlite3 *db, char* id);
 void crearTablaPrestamo(sqlite3* db);
 
 //AUTOR
-void insertarAutor(sqlite3*db, Autor autor);
+void insertarAutor(sqlite3*db, Libro libro);
 void leerAutores(sqlite3* db);
 void eliminarAutores(sqlite3* db, const char* nombreAutor);
 void buscarAutor(sqlite3* db, const char* termino);
 void crearTablaAutor(sqlite3* db);
 
+void borrarUsuarioTabla(sqlite3* db);
+void borrarAutor(sqlite3* db);
+void borrarPrestamo(sqlite3* db);
+void borrarLibro(sqlite3* db);
 #endif /* DATABASE_H */
