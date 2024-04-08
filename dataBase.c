@@ -10,7 +10,7 @@ sqlite3* inicializarBaseDatos(const char* nombreArchivo) {
     sqlite3* db;
     int resultado = sqlite3_open(nombreArchivo, &db);
     if (resultado != SQLITE_OK) {
-        fprintf(stderr, "Error al abrir o crear la base de datos: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "Error al abrir o crear la base de datos: %s\n\n", sqlite3_errmsg(db));
         sqlite3_close(db);
         exit(1);
     }
@@ -18,7 +18,7 @@ sqlite3* inicializarBaseDatos(const char* nombreArchivo) {
 }
 
 void crearTablaLibro(sqlite3* db){
-    char* sql = "CREATE TABLE IF NOT EXISTS Libro (ISBN TEXT PRIMARY KEY, Titulo TEXT, Genero TEXT, Nom_Autor TEXT REFERENCES Autor(Nombre), Ap_Autor TEXT REFERENCES Autor(Apellido), Cod_Editorial INTEGER, NumEjemplares INTEGER,Año_Publicacion INTEGER)";
+    char* sql = "CREATE TABLE IF NOT EXISTS Libro (ISBN TEXT PRIMARY KEY, Titulo TEXT, Genero TEXT, Nom_Autor TEXT REFERENCES Autor(Nombre), Ap_Autor TEXT REFERENCES Autor(Apellido), Año_Publicacion INTEGER, NumEjemplares INTEGER, Cod_Editorial INTEGER)";
     sqlite3_stmt* stmt;
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
@@ -37,7 +37,7 @@ void crearTablaLibro(sqlite3* db){
 
 void insertarLibro(sqlite3* db, Libro libro) {
     // Preparar la consulta SQL para insertar un nuevo libro
-    char* sql = "INSERT INTO Libro (ISBN, Titulo, Genero, Nom_Autor, Ap_Autor, NumEjemplares, Año_Publicacion, Cod_Editorial) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    char* sql = "INSERT INTO Libro (ISBN, Titulo, Genero, Nom_Autor, Ap_Autor, Año_Publicacion, NumEjemplares, Cod_Editorial) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
     // Crear una declaración SQL
     sqlite3_stmt* stmt;
@@ -52,8 +52,8 @@ void insertarLibro(sqlite3* db, Libro libro) {
     sqlite3_bind_text(stmt, 3, libro.genero, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, libro.nom_autor, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 5, libro.apellido_autor, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 6, libro.numEjemplares);
-    sqlite3_bind_int(stmt, 7, libro.anyoPublicacion);
+    sqlite3_bind_int(stmt, 6, libro.anyoPublicacion);
+    sqlite3_bind_int(stmt, 7, libro.numEjemplares);
     sqlite3_bind_int(stmt, 8, libro.cod_Editorial);
 
 
@@ -61,11 +61,12 @@ void insertarLibro(sqlite3* db, Libro libro) {
     // Ejecutar la consulta
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
-        printf("Revise los datos introducidos\n");
+        printf("Revise los datos introducidos\n\n");
         sqlite3_finalize(stmt);
         return;
     } else {
         printf("Libro agregado correctamente\n");
+        printf("\n");
         comprobarAutor(db, libro);
     }
 
@@ -80,9 +81,9 @@ void leerLibros(sqlite3* db) {
         fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
         return;
     }
-
+    printf("\n");
     printf("================================================================= Libros en la Biblioteca =====================================================================================\n");
-    printf("%-15s %-30s %-20s %-20s %-30s %-20s %-20s %-20s\n", "ISBN", "Titulo", "Genero", "Nombre_A", "Apellido_A", "nEjemplares", "AñoPublicacion", "cod_Editorial");
+    printf("%-15s %-30s %-20s %-20s %-30s %-20s %-20s %-20s\n", "ISBN", "Titulo", "Genero", "Nombre_A", "Apellido_A", "AñoPublicacion", "nEjemplares", "cod_Editorial");
     printf("===============================================================================================================================================================================\n");
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
@@ -91,12 +92,12 @@ void leerLibros(sqlite3* db) {
         const unsigned char* genero = sqlite3_column_text(stmt, 2);
         const unsigned char* n_autor = sqlite3_column_text(stmt, 3);
         const unsigned char* a_autor = sqlite3_column_text(stmt, 4);
-        int nEjemplares = sqlite3_column_int(stmt, 5);
-        int anyo = sqlite3_column_int(stmt, 6);
+        int anyo = sqlite3_column_int(stmt, 5);
+        int nEjemplares = sqlite3_column_int(stmt, 6);
         int cod_e = sqlite3_column_int(stmt, 7);
 
 
-        printf("%-15s %-30s %-20s %-20s %-30s %-20d %-20d %-20d\n\n", isbn, titulo, genero, n_autor, a_autor, nEjemplares, anyo, cod_e);
+        printf("%-15s %-30s %-20s %-20s %-30s %-20d %-20d %-20d\n\n", isbn, titulo, genero, n_autor, a_autor, anyo, nEjemplares, cod_e);
     }
 
     sqlite3_finalize(stmt);
@@ -116,7 +117,7 @@ void buscarLibroBD(sqlite3* db, const char* termino) {
     sqlite3_bind_text(stmt, 3, termino, -1, SQLITE_STATIC);
 
     printf("================================================================= Resultados de la búsqueda ===================================================================================\n");
-    printf("%-15s %-30s %-20s %-20s %-30s %-20s %-20s %-20s\n", "ISBN", "Titulo", "Genero", "Nombre_A", "Apellido_A", "nEjemplares", "AñoPublicacion", "cod_Editorial");
+    printf("%-15s %-30s %-20s %-20s %-30s %-20s %-20s %-20s\n", "ISBN", "Titulo", "Genero", "Nombre_A", "Apellido_A", "AñoPublicacion", "nEjemplares", "cod_Editorial");
     printf("===============================================================================================================================================================================\n");
 
     int resultado;
@@ -126,13 +127,14 @@ void buscarLibroBD(sqlite3* db, const char* termino) {
         const unsigned char* genero = sqlite3_column_text(stmt, 2);
         const unsigned char* n_autor = sqlite3_column_text(stmt, 3);
         const unsigned char* a_autor = sqlite3_column_text(stmt, 4);
-        int nEjemplares = sqlite3_column_int(stmt, 5);
-        int anyo = sqlite3_column_int(stmt, 6);
+        int nEjemplares = sqlite3_column_int(stmt, 6);
+        int anyo = sqlite3_column_int(stmt, 5);
         int cod_e = sqlite3_column_int(stmt, 7);
 
 
-        printf("%-15s %-30s %-20s %-20s %-30s %-20d %-20d %-20d\n\n", isbn, titulo, genero, n_autor, a_autor, nEjemplares, anyo, cod_e);
+        printf("%-15s %-30s %-20s %-20s %-30s %-20d %-20d %-20d\n\n", isbn, titulo, genero, n_autor, a_autor, anyo, nEjemplares, cod_e);
     }
+    printf("\n");
 
     if (resultado != SQLITE_DONE) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
@@ -206,6 +208,7 @@ void insertarUsuario(sqlite3* db, Usuario usuario) {
     } else {
         printf("Usuario agregado correctamente\n");
     }
+    printf("\n");
 
     sqlite3_finalize(stmt);
 }
@@ -460,7 +463,7 @@ void editarUsuarioDB(sqlite3* db, char* id) {
         const unsigned char* correo = sqlite3_column_text(stmt, 3);
         const unsigned char* contr = sqlite3_column_text(stmt, 4);
 
-        printf("%-10s %-10s %-10s %-25s %-15s\n", id, nombre, apellido, correo, contr);
+        printf("%-10s %-10s %-20s %-25s %-15s\n", id, nombre, apellido, correo, contr);
 
         ejecutarMenuEdicion(db, (char *)id);
 
@@ -469,6 +472,7 @@ void editarUsuarioDB(sqlite3* db, char* id) {
     } else {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
     }
+    printf("\n");
 
 }
 

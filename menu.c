@@ -9,6 +9,7 @@
 
 void agregarNuevoLibro(sqlite3* db) {
     // Solicitar detalles del nuevo libro al usuario
+    printf("\n");
     printf("Ingrese el ISBN del libro: ");
     char isbn[15];
     scanf(" %[^\n]", isbn);
@@ -58,6 +59,7 @@ void agregarNuevoLibro(sqlite3* db) {
 }
 
 void buscarLibro(sqlite3* db) {
+    printf("\n");
     char termino[100];
     printf("Ingrese el termino de busqueda (titulo, autor, etc.): ");
     scanf("%s", termino);
@@ -70,7 +72,7 @@ void buscarLibro(sqlite3* db) {
 }
 
 void mostrarMenuLibros() {
-    printf("=== Menu de Gestion de Libros ===\n");
+    printf("\n=== Menu de Gestion de Libros ===\n");
     printf("1. Agregar Nuevo Libro\n");
     printf("2. Mostrar Todos los Libros\n");
     printf("3. Buscar Libro\n");
@@ -94,7 +96,8 @@ void ejecutarMenuLibros(sqlite3* db) {
                 buscarLibro(db);
                 break;
             case 4:
-                printf("Volviendo al Menu Principal...\n");
+                printf("\n");
+                printf("Volviendo al Menu Principal...\n\n");
                 break;
             default:
                 printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
@@ -107,6 +110,7 @@ void ejecutarMenuLibros(sqlite3* db) {
 
 void agregarNuevoUsuario(sqlite3* db) {
 // Solicitar detalles del nuevo usuario
+    printf("\n");
     printf("Ingrese el ID del usuario: ");
     char id[50];
     scanf("%s", id);
@@ -139,10 +143,10 @@ void agregarNuevoUsuario(sqlite3* db) {
 
 
     insertarUsuario(db, nuevoUsuario);
-    printf("El nuevo usuario ha sido agregado correctamente.\n");
 }
 
 void buscarUsuario(sqlite3* db) {
+    printf("\n");
     printf("Ingrese el ID o nombre del usuario: ");
     char termino[50];
     scanf("%s", termino);
@@ -151,6 +155,7 @@ void buscarUsuario(sqlite3* db) {
 }
 
 void editarUsuario(sqlite3* db){
+    printf("\n");
     printf("Introduce el ID del usuario que deseas editar: ");
     char id[50];
     scanf("%s", id);
@@ -159,6 +164,7 @@ void editarUsuario(sqlite3* db){
 }
 
 void borrarUsuario(sqlite3* db) {
+    printf("\n");
     printf("Introduce el ID del usuario que deseas borrar: ");
     char id[50];
     scanf("%s", id);
@@ -168,7 +174,7 @@ void borrarUsuario(sqlite3* db) {
 
 
 void mostrarMenuUsuarios() {
-    printf("=== Menu de Gestion de Usuarios ===\n");
+    printf("\n=== Menu de Gestion de Usuarios ===\n");
     printf("1. Agregar Nuevo Usuario\n");
     printf("2. Mostrar Todos los Usuarios\n");
     printf("3. Buscar Usuario\n");
@@ -200,7 +206,8 @@ void ejecutarMenuUsuarios(sqlite3* db) {
                 borrarUsuario(db);
                 break;
             case 6:
-                printf("Volviendo al Menu Principal...\n");
+                printf("\n");
+                printf("Volviendo al Menu Principal...\n\n");                
                 break;
             default:
                 printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
@@ -245,6 +252,7 @@ bool usuarioExiste(sqlite3* db, const char* idUsuario) {
 
 void agregarNuevoPrestamo(sqlite3* db) {
     // Solicitar detalles del nuevo préstamo al usuario
+    printf("\n");
     printf("Ingrese el ISBN del libro: ");
     char idLibro[15];
     scanf("%14s", idLibro);
@@ -277,11 +285,12 @@ void agregarNuevoPrestamo(sqlite3* db) {
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
-        printf("Por favor, revise que el ISBN introducido es válido\n");
+        printf("Por favor, revise que el ISBN introducido es válido\n\n");
 
     } else {
-        printf("El nuevo prestamo ha sido agregado correctamente.\n");
+        printf("El nuevo prestamo ha sido agregado correctamente.\n\n");
     }
+
 
     sqlite3_finalize(stmt);
 }
@@ -317,13 +326,14 @@ char* calcularNuevaFechaVencimiento(const char* fechaVencimientoActual) {
 
 void renovarPrestamo(sqlite3* db) {
     // Solicitar el ID del libro
-    printf("Ingrese el ID del libro cuyo prestamo desea renovar: ");
+    printf("\n");
+    printf("Ingrese el ISBN del libro cuyo prestamo desea renovar: ");
     int idLibro;
     scanf("%d", &idLibro);
 
     // Consultar la fecha de vencimiento actual del préstamo asociado al libro
     char selectSql[200];
-    sprintf(selectSql, "SELECT Fecha_Vencimiento FROM Prestamo WHERE ID_Libro = %d", idLibro);
+    sprintf(selectSql, "SELECT Fecha_Vencimiento FROM Prestamo WHERE ISBN_Libro = %d", idLibro);
     sqlite3_stmt* stmt;
     int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -340,14 +350,14 @@ void renovarPrestamo(sqlite3* db) {
 
         // Actualizar la fecha de vencimiento en la base de datos
         char updateSql[200];
-        sprintf(updateSql, "UPDATE Prestamo SET Fecha_Vencimiento = '%s' WHERE ID_Libro = %d", nuevaFechaVencimiento, idLibro);
+        sprintf(updateSql, "UPDATE Prestamo SET Fecha_Vencimiento = '%s' WHERE ISBN_Libro = %d", nuevaFechaVencimiento, idLibro);
         int updateResult = sqlite3_exec(db, updateSql, NULL, 0, NULL);
         if (updateResult != SQLITE_OK) {
             printf("Error al actualizar la fecha de vencimiento: %s\n", sqlite3_errmsg(db));
             return;
         }
 
-        printf("El prestamo del libro con ID %d ha sido renovado con exito.\n", idLibro);
+        printf("El prestamo del libro con ID %d ha sido renovado con exito.\n\n", idLibro);
     } else {
         printf("No se encontro un prestamo asociado al libro con ID %d.\n", idLibro);
     }
@@ -359,12 +369,12 @@ void renovarPrestamo(sqlite3* db) {
 void registrarDevolucion(sqlite3* db) {
     // Solicitar al usuario que ingrese el ID del libro devuelto
     int idLibro;
-    printf("Ingrese el ID del libro a devolver: ");
+    printf("\nIngrese el ISBN del libro a devolver: ");
     scanf("%d", &idLibro);
 
     // Consultar la tabla Prestamo para verificar si hay préstamos activos para este libro
     char selectSql[100];
-    sprintf(selectSql, "SELECT ID FROM Prestamo WHERE ID_Libro = %d AND Estado = 0", idLibro);
+    sprintf(selectSql, "SELECT ID FROM Prestamo WHERE ISBN_Libro = %d AND Estado = 0", idLibro);
     sqlite3_stmt* stmt;
     int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -393,21 +403,21 @@ void registrarDevolucion(sqlite3* db) {
 
     // Verificar si se encontraron préstamos activos para este libro
     if (prestamosActivos) {
-        printf("El libro ha sido devuelto con exito.\n");
+        printf("El libro ha sido devuelto con exito.\n\n");
     } else {
-        printf("No hay prestamos pendientes para este libro.\n");
+        printf("No hay prestamos pendientes para este libro.\n\n");
     }
 }
 
 void buscarPrestamosPendientes(sqlite3* db) {
     // Solicitar al usuario que ingrese el ID del usuario para buscar sus préstamos pendientes
     char idUsuario[50];
-    printf("Ingrese el ID del usuario para buscar sus prestamos pendientes: ");
+    printf("\nIngrese el ID del usuario para buscar sus prestamos pendientes: ");
     scanf("%s", idUsuario);
 
     // Consultar la tabla Prestamo para obtener los préstamos pendientes del usuario especificado
     char selectSql[200];
-    sprintf(selectSql, "SELECT ID_Libro, Fecha_Vencimiento FROM Prestamo WHERE ID_Usuario = '%s' AND Estado = 0", idUsuario);
+    sprintf(selectSql, "SELECT ISBN_Libro, Fecha_Vencimiento FROM Prestamo WHERE ID_Usuario = '%s' AND Estado = 0", idUsuario);
     sqlite3_stmt* stmt;
     int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -417,19 +427,21 @@ void buscarPrestamosPendientes(sqlite3* db) {
 
     // Mostrar los préstamos pendientes del usuario
     printf("Prestamos pendientes del usuario %s:\n", idUsuario);
-    printf("ID_Libro\tFecha_Vencimiento\n");
+    printf("ISBN_Libro\tFecha_Vencimiento\n");
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         const char* idLibro = (const char*)sqlite3_column_text(stmt, 0);
         const char* fechaVencimiento = (const char*)sqlite3_column_text(stmt, 1);
-        printf("%s\t%s\n", idLibro, fechaVencimiento);
+        printf("%s\t\t%s\n", idLibro, fechaVencimiento);
     }
+
+    printf("\n");
 
     // Liberar la consulta preparada
     sqlite3_finalize(stmt);
 }
 
 void mostrarMenuPrestamos() {
-    printf("=== Menu de Gestion de Prestamos ===\n");
+    printf("\n=== Menu de Gestion de Prestamos ===\n");
     printf("1. Agregar Nuevo Prestamo\n");
     printf("2. Renovar Prestamo Existente\n");
     printf("3. Registrar Devolucion de Libro\n");
@@ -457,7 +469,8 @@ void ejecutarMenuPrestamos(sqlite3* db) {
                 buscarPrestamosPendientes(db);
                 break;
             case 5:
-                printf("Volviendo al Menu Principal...\n");
+                printf("\n");
+                printf("Volviendo al Menu Principal...\n\n");
                 break;
             default:
                 printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
@@ -491,7 +504,7 @@ void leerFicheroConfiguracion(){
         return;
     }
 
-    printf("=== FICHERO DE CONFIGURACION ===\n");
+    printf("\n=== FICHERO DE CONFIGURACION ===\n");
     while(fgets(linea, sizeof(linea), archivo) !=NULL){
         printf("%s", linea);
     };
@@ -499,7 +512,7 @@ void leerFicheroConfiguracion(){
 }
 
 void mostrarMenuConfiguracionFicheros(){
-    printf("=== Fichero de configuracion ===\n");
+    printf("\n=== Fichero de configuracion ===\n");
     printf("1. Leer Fichero de configuracion con las rutas del los archivos del programa \n");
     printf("2. Volver al Menu de Configuracion del Sistema\n");
     printf("Seleccione una opcion: ");
@@ -513,6 +526,9 @@ void ejecutarMenuConfiguracionFicheros(sqlite3*db){
         switch(opcion){
             case 1:
                 leerFicheroConfiguracion();
+                break;
+            case 2:
+                printf("Volviendo al menu de configuracion del sistema...");
                 break;
             default:
                 printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
@@ -561,14 +577,14 @@ void actualizarParametros(const char *clave, const char *nuevoValor){
    
 
    if(claveActualizada==1){
-    printf("Configuracion '%s' actualizada con exito \n", clave);
+    printf("Configuracion '%s' actualizada con exito \n\n", clave);
    }else{
     printf("Clave '%s' no encontrada\n", clave );
    }
    
 }
 void mostrarMenuConfiguracionParametros(){
-    printf("=== Configuracion de Politicas y Parametros del Sistema ===\n");
+    printf("\n=== Configuracion de Politicas y Parametros del Sistema ===\n");
     printf("1. Configurar duracion maxima de prestamo \n");
     printf("2. Configurar cantidad maxima de libros prestados por usuario al dia\n");
     printf("3. Configurar multa por devolucion tardia\n");
@@ -585,28 +601,28 @@ void ejecutarMenuConfiguracionParametros(sqlite3* db){
         scanf("%d", &opcion);
         switch (opcion){
         case 1:
-            printf("Ingrese la nueva direccion maxima de prestamo (en dias): ");
-            scanf("%d", nuevoValor);
+            printf("\nIngrese la nueva duración maxima de prestamo (en dias): ");
+            scanf("%49s", nuevoValor);
             actualizarParametros("DuracionMaximaPrestamo", nuevoValor);
             
             break;
         case 2: 
-            printf("Ingrese la nueva cantidad maxima de libros prestados por usuario: ");
-            scanf("%d", nuevoValor);
+            printf("\nIngrese la nueva cantidad maxima de libros prestados por usuario: ");
+            scanf("%49s", nuevoValor);
             actualizarParametros("CantidadMaximaLibros", nuevoValor);
             
             break;
         case 3:
-            printf("Ingrese el nuevo numero de dias de sanción en caso de devolución tardia por dia: ");
-            scanf("%d", nuevoValor);
+            printf("\nIngrese el nuevo numero de dias de sanción en caso de devolución tardia por dia: ");
+            scanf("%49s", nuevoValor);
             actualizarParametros("MultaDevolucionTardia", nuevoValor);
             
             break;
         case 4: 
-            printf("Volviendo al Menu de Configuracioon del Sistema...\n");
+            printf("\nVolviendo al Menu de Configuracioon del Sistema...\n\n");
             break;
         default:
-            printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
+            printf("\nOpcion no valida. Por favor, seleccione una opcion valida.\n\n");
             break;
         }
     } while (opcion != 4);
@@ -614,7 +630,7 @@ void ejecutarMenuConfiguracionParametros(sqlite3* db){
 }
 
 void mostrarMenuConfiguracion(){
-    printf("=== Configuracion Del Sistema ===\n");
+    printf("\n=== Configuracion Del Sistema ===\n");
     printf("1. Fichero de Configuracion\n");
     printf("2. Politicas y Parametros del Sistema\n");
     printf("3. Volver al Menu Principal\n");
@@ -642,7 +658,8 @@ void ejecutarMenuInformes(sqlite3* db) {
                 generarInformeLibros(db);
                 break;
             case 4:
-                printf("Volviendo al Menu Principal...\n");
+                printf("\n");
+                printf("Volviendo al Menu Principal...\n\n");
                 break;
             default:
                 printf("Opcion no valida. Por favor, seleccione una opción valida.\n");
@@ -652,7 +669,7 @@ void ejecutarMenuInformes(sqlite3* db) {
 }
 
 void mostrarMenuInformes() {
-    printf("=== Menu de Informes ===\n");
+    printf("\n=== Menu de Informes ===\n");
     printf("1. Informe de Usuarios\n");
     printf("2. Informe de Prestamos\n");
     printf("3. Informe de Libros\n");
@@ -663,9 +680,9 @@ void mostrarMenuInformes() {
 
 // USUARIOS
 // Función para contar el número de préstamos por usuario
-int contarPrestamosPorUsuario(sqlite3* db, int userID) {
+int contarPrestamosPorUsuario(sqlite3* db, char* userID) {
     char sql[100];
-    sprintf(sql, "SELECT COUNT(*) FROM Prestamo WHERE ID_Usuario = %d", userID);
+    sprintf(sql, "SELECT COUNT(*) FROM Prestamo WHERE ID_Usuario = '%s'", userID);
     sqlite3_stmt* stmt;
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -681,20 +698,20 @@ int contarPrestamosPorUsuario(sqlite3* db, int userID) {
 }
 
 // Función para obtener el ID del usuario con más préstamos
-int obtenerUsuarioConMasPrestamos(sqlite3* db) {
+char* obtenerUsuarioConMasPrestamos(sqlite3* db) {
     char sql[] = "SELECT ID_Usuario FROM Prestamo GROUP BY ID_Usuario ORDER BY COUNT(*) DESC LIMIT 1";
     sqlite3_stmt* stmt;
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
         printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
-        return -1;
+        return NULL;
     }
-    int userID = -1;
+    char* userID;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        userID = sqlite3_column_int(stmt, 0);
+        userID = (char*)sqlite3_column_text(stmt, 0);
     }
     sqlite3_finalize(stmt);
-    return userID;
+    return (char*)userID;
 }
 
 // Función para contar el número de usuarios registrados
@@ -716,7 +733,7 @@ int contarUsuariosRegistrados(sqlite3* db) {
 
 // Función para generar el informe de usuarios
 void generarInformeUsuarios(sqlite3* db) {
-    printf("=== Informe de Usuarios ===\n");
+    printf("\n=== Informe de Usuarios ===\n\n");
     // Usuario que no haya realizado ningún préstamo
     printf("Usuarios sin prestamos:\n");
     char sqlUsuariosSinPrestamos[] = "SELECT * FROM Usuario WHERE ID_Usuario NOT IN (SELECT DISTINCT ID_Usuario FROM Prestamo)";
@@ -726,19 +743,19 @@ void generarInformeUsuarios(sqlite3* db) {
         printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
     } else {
         while (sqlite3_step(stmtUsuariosSinPrestamos) == SQLITE_ROW) {
-            int userID = sqlite3_column_int(stmtUsuariosSinPrestamos, 0);
+            char* userID = (char*)sqlite3_column_text(stmtUsuariosSinPrestamos, 0);
             char* userName = (char*)sqlite3_column_text(stmtUsuariosSinPrestamos, 1);
-            printf("ID: %d, Nombre: %s\n", userID, userName);
+            printf("ID: %s, Nombre: %s\n", userID, userName);
         }
     }
     sqlite3_finalize(stmtUsuariosSinPrestamos);
 
     // Usuario con más préstamos
     printf("\nUsuario con más prestamos:\n");
-    int userIDConMasPrestamos = obtenerUsuarioConMasPrestamos(db);
-    if (userIDConMasPrestamos != -1) {
+    char* userIDConMasPrestamos = obtenerUsuarioConMasPrestamos(db);
+    if (userIDConMasPrestamos != NULL) {
         int numPrestamos = contarPrestamosPorUsuario(db, userIDConMasPrestamos);
-        printf("ID: %d, Numero de prestamos: %d\n", userIDConMasPrestamos, numPrestamos);
+        printf("ID: %s, Numero de prestamos: %d\n", (char*)userIDConMasPrestamos, numPrestamos);
     } else {
         printf("No hay usuarios registrados.\n");
     }
@@ -754,13 +771,14 @@ void generarInformeUsuarios(sqlite3* db) {
         scanf("%d", &opcion);
         switch (opcion) {
             case 1:
-                printf("Volviendo al Menu de Informes...\n");
+                printf("\nVolviendo al Menu de Informes...\n\n");
                 return; // Sale de la función, volviendo al menú de informes
             case 2:
-                printf("Volviendo al Menu Principal...\n");
+                printf("\n");
+                printf("Volviendo al Menu Principal...\n\n");
                 return; // Sale de la función, volviendo al menú principal
             default:
-                printf("Opción no valida. Por favor, seleccione una opcion valida.\n");
+                printf("\nOpción no valida. Por favor, seleccione una opcion valida.\n\n");
                 break;
         }
     } while (opcion != 1 && opcion != 2);
@@ -789,7 +807,7 @@ int obtenerNumeroPrestamosActivos(sqlite3* db) {
 
 // Función para obtener el ID del libro más prestado
 int obtenerLibroMasPrestado(sqlite3* db) {
-    char sql[] = "SELECT ID_Libro FROM Prestamo GROUP BY ID_Libro ORDER BY COUNT(*) DESC LIMIT 1";
+    char sql[] = "SELECT ISBN_Libro FROM Prestamo GROUP BY ISBN_Libro ORDER BY COUNT(*) DESC LIMIT 1";
     sqlite3_stmt* stmt;
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -806,7 +824,7 @@ int obtenerLibroMasPrestado(sqlite3* db) {
 
 // Función para obtener el ID del libro menos prestado
 int obtenerLibroMenosPrestado(sqlite3* db) {
-    char sql[] = "SELECT ID_Libro FROM Prestamo GROUP BY ID_Libro ORDER BY COUNT(*) ASC LIMIT 1";
+    char sql[] = "SELECT ISBN_Libro FROM Prestamo GROUP BY ISBN_Libro ORDER BY COUNT(*) ASC LIMIT 1";
     sqlite3_stmt* stmt;
     int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
@@ -823,7 +841,7 @@ int obtenerLibroMenosPrestado(sqlite3* db) {
 
 // Función para generar el informe de préstamos
 void generarInformePrestamos(sqlite3* db) {
-    printf("=== Informe de Prestamos ===\n");
+    printf("\n=== Informe de Prestamos ===\n");
 
     // Número total de préstamos activos
     int numPrestamosActivos = obtenerNumeroPrestamosActivos(db);
@@ -832,7 +850,7 @@ void generarInformePrestamos(sqlite3* db) {
     // Libro más prestado
     int libroMasPrestadoID = obtenerLibroMasPrestado(db);
     if (libroMasPrestadoID != -1) {
-        printf("ID del libro más prestado: %d\n", libroMasPrestadoID);
+        printf("isbn del libro más prestado: %d\n", libroMasPrestadoID);
     } else {
         printf("No hay libros prestados.\n");
     }
@@ -840,7 +858,7 @@ void generarInformePrestamos(sqlite3* db) {
     // Libro menos prestado
     int libroMenosPrestadoID = obtenerLibroMenosPrestado(db);
     if (libroMenosPrestadoID != -1) {
-        printf("ID del libro menos prestado: %d\n", libroMenosPrestadoID);
+        printf("ISBN del libro menos prestado: %d\n", libroMenosPrestadoID);
     } else {
         printf("No hay libros prestados.\n");
     }
@@ -853,13 +871,14 @@ void generarInformePrestamos(sqlite3* db) {
         scanf("%d", &opcion);
         switch (opcion) {
             case 1:
-                printf("Volviendo al Menu de Informes...\n");
+                printf("\nVolviendo al Menu de Informes...\n\n");
                 return; // Sale de la función, volviendo al menú de informes
             case 2:
-                printf("Volviendo al Menu Principal...\n");
+                printf("\n");
+                printf("Volviendo al Menu Principal...\n\n");
                 return; // Sale de la función, volviendo al menú principal
             default:
-                printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
+                printf("\nOpcion no valida. Por favor, seleccione una opcion valida.\n\n");
                 break;
         }
     } while (opcion != 1 && opcion != 2);
@@ -921,7 +940,7 @@ int obtenerNumLibrosDevueltos(sqlite3* db) {
 
 // Función para generar el informe de libros
 void generarInformeLibros(sqlite3* db) {
-    printf("=== Informe de Libros ===\n");
+    printf("\n=== Informe de Libros ===\n");
 
     // Número de libros que no se han prestado
     int numLibrosNoPrestados = obtenerNumLibrosNoPrestados(db);
@@ -947,13 +966,14 @@ void generarInformeLibros(sqlite3* db) {
         scanf("%d", &opcion);
         switch (opcion) {
             case 1:
-                printf("Volviendo al Menu de Informes...\n");
+                printf("\nVolviendo al Menu de Informes...\n\n");
                 return; // Sale de la función, volviendo al menú de informes
             case 2:
-                printf("Volviendo al Menu Principal...\n");
+                printf("\n");
+                printf("Volviendo al Menu Principal...\n\n");
                 return; // Sale de la función, volviendo al menú principal
             default:
-                printf("Opcion no válida. Por favor, seleccione una opcion valida.\n");
+                printf("\nOpcion no válida. Por favor, seleccione una opcion valida.\n\n");
                 break;
         }
     } while (opcion != 1 && opcion != 2);
@@ -975,7 +995,8 @@ void ejecutarMenuConfiguracion(sqlite3* db){
             ejecutarMenuConfiguracionParametros(db);
             break;
         case 3:
-            printf("Volviendo al Menu Principal...\n");
+            printf("\n");
+            printf("Volviendo al Menu Principal...\n\n");
             break;
         default:
             printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
