@@ -674,7 +674,7 @@ void mostrarMenuInformes() {
     printf("2. Informe de Prestamos\n");
     printf("3. Informe de Libros\n");
     printf("4. Volver al Menu Principal\n");
-    printf("Seleccione una opción: ");
+    printf("Seleccione una opcion: ");
 }
 
 
@@ -708,7 +708,10 @@ char* obtenerUsuarioConMasPrestamos(sqlite3* db) {
     }
     char* userID;
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        userID = (char*)sqlite3_column_text(stmt, 0);
+        const unsigned char* id_text = sqlite3_column_text(stmt, 0);
+        if (id_text) {
+            userID = strdup((const char*)id_text); 
+        }    
     }
     sqlite3_finalize(stmt);
     return (char*)userID;
@@ -751,7 +754,7 @@ void generarInformeUsuarios(sqlite3* db) {
     sqlite3_finalize(stmtUsuariosSinPrestamos);
 
     // Usuario con más préstamos
-    printf("\nUsuario con más prestamos:\n");
+    printf("\nUsuario con mas prestamos:\n");
     char* userIDConMasPrestamos = obtenerUsuarioConMasPrestamos(db);
     if (userIDConMasPrestamos != NULL) {
         int numPrestamos = contarPrestamosPorUsuario(db, userIDConMasPrestamos);
@@ -778,7 +781,7 @@ void generarInformeUsuarios(sqlite3* db) {
                 printf("Volviendo al Menu Principal...\n\n");
                 return; // Sale de la función, volviendo al menú principal
             default:
-                printf("\nOpción no valida. Por favor, seleccione una opcion valida.\n\n");
+                printf("\nOpcion no valida. Por favor, seleccione una opcion valida.\n\n");
                 break;
         }
     } while (opcion != 1 && opcion != 2);
