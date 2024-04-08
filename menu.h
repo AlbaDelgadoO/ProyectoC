@@ -1,6 +1,6 @@
 #ifndef MENU_H
 #define MENU_H
-
+#include <stdbool.h>
 #include "sqlite3.h"
 
 void mostrarMenuPrincipal();
@@ -17,7 +17,17 @@ void borrarUsuario(sqlite3* db);
 void mostrarMenuUsuarios();
 void ejecutarMenuUsuarios(sqlite3* db);
 
-// CONFIGURACIÓN DEL SISTEMA
+// GESTION DE PRESTAMOS
+bool usuarioExiste(sqlite3* db, const char* idUsuario);
+void agregarNuevoPrestamo(sqlite3* db);
+char* calcularNuevaFechaVencimiento(const char* fechaVencimientoActual);
+void renovarPrestamo(sqlite3* db);
+void registrarDevolucion(sqlite3* db);
+void buscarPrestamosPendientes(sqlite3* db);
+void mostrarMenuPrestamos();
+void ejecutarMenuPrestamos(sqlite3* db);
+
+// CONFIGURACION DEL SISTEMA
 void crearFicheroLog();
 void leerFicheroConfiguracion();
 void mostrarMenuConfiguracionFicheros();
