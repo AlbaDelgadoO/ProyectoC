@@ -21,6 +21,7 @@ void ejecutarMenuUsuarios(sqlite3* db);
 void crearFicheroLog();
 void leerFicheroConfiguracion();
 void mostrarMenuConfiguracionFicheros();
+void actualizarParametros(const char *clave, const char *nuevoValor);
 void mostrarMenuConfiguracionParametros();
 void ejecutarMenuConfiguracionParametros(sqlite3* db);
 void mostrarMenuConfiguracion();
