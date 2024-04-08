@@ -554,6 +554,346 @@ void mostrarMenuConfiguracion(){
 
 }
 
+
+// GENERACION DE INFORMES
+
+// Función para ejecutar el menú de informes
+void ejecutarMenuInformes(sqlite3* db) {
+    int opcion;
+    do {
+        mostrarMenuInformes();
+        scanf("%d", &opcion);
+        switch (opcion) {
+            case 1:
+                generarInformeUsuarios(db);
+                break;
+            case 2:
+                generarInformePrestamos(db);
+                break;
+            case 3:
+                generarInformeLibros(db);
+                break;
+            case 4:
+                printf("Volviendo al Menu Principal...\n");
+                break;
+            default:
+                printf("Opcion no valida. Por favor, seleccione una opción valida.\n");
+                break;
+        }
+    } while (opcion != 4);
+}
+
+void mostrarMenuInformes() {
+    printf("=== Menu de Informes ===\n");
+    printf("1. Informe de Usuarios\n");
+    printf("2. Informe de Prestamos\n");
+    printf("3. Informe de Libros\n");
+    printf("4. Volver al Menu Principal\n");
+    printf("Seleccione una opción: ");
+}
+
+
+// USUARIOS
+// Función para contar el número de préstamos por usuario
+int contarPrestamosPorUsuario(sqlite3* db, int userID) {
+    char sql[100];
+    sprintf(sql, "SELECT COUNT(*) FROM Prestamo WHERE ID_Usuario = %d", userID);
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        count = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return count;
+}
+
+// Función para obtener el ID del usuario con más préstamos
+int obtenerUsuarioConMasPrestamos(sqlite3* db) {
+    char sql[] = "SELECT ID_Usuario FROM Prestamo GROUP BY ID_Usuario ORDER BY COUNT(*) DESC LIMIT 1";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    int userID = -1;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        userID = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return userID;
+}
+
+// Función para contar el número de usuarios registrados
+int contarUsuariosRegistrados(sqlite3* db) {
+    char sql[] = "SELECT COUNT(*) FROM Usuario";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        count = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return count;
+}
+
+// Función para generar el informe de usuarios
+void generarInformeUsuarios(sqlite3* db) {
+    printf("=== Informe de Usuarios ===\n");
+    // Usuario que no haya realizado ningún préstamo
+    printf("Usuarios sin prestamos:\n");
+    char sqlUsuariosSinPrestamos[] = "SELECT * FROM Usuario WHERE ID_Usuario NOT IN (SELECT DISTINCT ID_Usuario FROM Prestamo)";
+    sqlite3_stmt* stmtUsuariosSinPrestamos;
+    int resultUsuariosSinPrestamos = sqlite3_prepare_v2(db, sqlUsuariosSinPrestamos, -1, &stmtUsuariosSinPrestamos, NULL);
+    if (resultUsuariosSinPrestamos != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+    } else {
+        while (sqlite3_step(stmtUsuariosSinPrestamos) == SQLITE_ROW) {
+            int userID = sqlite3_column_int(stmtUsuariosSinPrestamos, 0);
+            char* userName = (char*)sqlite3_column_text(stmtUsuariosSinPrestamos, 1);
+            printf("ID: %d, Nombre: %s\n", userID, userName);
+        }
+    }
+    sqlite3_finalize(stmtUsuariosSinPrestamos);
+
+    // Usuario con más préstamos
+    printf("\nUsuario con más prestamos:\n");
+    int userIDConMasPrestamos = obtenerUsuarioConMasPrestamos(db);
+    if (userIDConMasPrestamos != -1) {
+        int numPrestamos = contarPrestamosPorUsuario(db, userIDConMasPrestamos);
+        printf("ID: %d, Numero de prestamos: %d\n", userIDConMasPrestamos, numPrestamos);
+    } else {
+        printf("No hay usuarios registrados.\n");
+    }
+
+    // Número de usuarios registrados
+    printf("\nNumero total de usuarios registrados: %d\n", contarUsuariosRegistrados(db));
+
+    int opcion;
+    do {
+        printf("1. Volver al Menu de Informes\n");
+        printf("2. Volver al Menu Principal\n");
+        printf("Seleccione una opcion: ");
+        scanf("%d", &opcion);
+        switch (opcion) {
+            case 1:
+                printf("Volviendo al Menu de Informes...\n");
+                return; // Sale de la función, volviendo al menú de informes
+            case 2:
+                printf("Volviendo al Menu Principal...\n");
+                return; // Sale de la función, volviendo al menú principal
+            default:
+                printf("Opción no valida. Por favor, seleccione una opcion valida.\n");
+                break;
+        }
+    } while (opcion != 1 && opcion != 2);
+}
+
+
+
+// PRESTAMOS
+
+// Función para obtener el número total de préstamos activos
+int obtenerNumeroPrestamosActivos(sqlite3* db) {
+    char sql[] = "SELECT COUNT(*) FROM Prestamo WHERE Estado = 'activo'";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        count = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return count;
+}
+
+// Función para obtener el ID del libro más prestado
+int obtenerLibroMasPrestado(sqlite3* db) {
+    char sql[] = "SELECT ID_Libro FROM Prestamo GROUP BY ID_Libro ORDER BY COUNT(*) DESC LIMIT 1";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    int bookID = -1;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        bookID = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return bookID;
+}
+
+// Función para obtener el ID del libro menos prestado
+int obtenerLibroMenosPrestado(sqlite3* db) {
+    char sql[] = "SELECT ID_Libro FROM Prestamo GROUP BY ID_Libro ORDER BY COUNT(*) ASC LIMIT 1";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    int bookID = -1;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        bookID = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return bookID;
+}
+
+// Función para generar el informe de préstamos
+void generarInformePrestamos(sqlite3* db) {
+    printf("=== Informe de Prestamos ===\n");
+
+    // Número total de préstamos activos
+    int numPrestamosActivos = obtenerNumeroPrestamosActivos(db);
+    printf("Numero total de prestamos activos: %d\n", numPrestamosActivos);
+
+    // Libro más prestado
+    int libroMasPrestadoID = obtenerLibroMasPrestado(db);
+    if (libroMasPrestadoID != -1) {
+        printf("ID del libro más prestado: %d\n", libroMasPrestadoID);
+    } else {
+        printf("No hay libros prestados.\n");
+    }
+
+    // Libro menos prestado
+    int libroMenosPrestadoID = obtenerLibroMenosPrestado(db);
+    if (libroMenosPrestadoID != -1) {
+        printf("ID del libro menos prestado: %d\n", libroMenosPrestadoID);
+    } else {
+        printf("No hay libros prestados.\n");
+    }
+
+    int opcion;
+    do {
+        printf("1. Volver al Menu de Informes\n");
+        printf("2. Volver al Menu Principal\n");
+        printf("Seleccione una opcion: ");
+        scanf("%d", &opcion);
+        switch (opcion) {
+            case 1:
+                printf("Volviendo al Menu de Informes...\n");
+                return; // Sale de la función, volviendo al menú de informes
+            case 2:
+                printf("Volviendo al Menu Principal...\n");
+                return; // Sale de la función, volviendo al menú principal
+            default:
+                printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
+                break;
+        }
+    } while (opcion != 1 && opcion != 2);
+}
+
+
+// LIBROS
+
+// Función para obtener el número de libros que no se han prestado
+int obtenerNumLibrosNoPrestados(sqlite3* db) {
+    char sql[] = "SELECT COUNT(*) FROM Libro WHERE numEjemplares > 0";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        count = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return count;
+}
+
+// Función para obtener el número de libros prestados
+int obtenerNumLibrosPrestados(sqlite3* db) {
+    char sql[] = "SELECT COUNT(*) FROM Libro WHERE numEjemplares = 0";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        count = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return count;
+}
+
+// Función para obtener el número de libros devueltos
+int obtenerNumLibrosDevueltos(sqlite3* db) {
+    char sql[] = "SELECT COUNT(*) FROM Prestamo WHERE Estado = 'devuelto'";
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return -1;
+    }
+    int count = 0;
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        count = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    return count;
+}
+
+// Función para generar el informe de libros
+void generarInformeLibros(sqlite3* db) {
+    printf("=== Informe de Libros ===\n");
+
+    // Número de libros que no se han prestado
+    int numLibrosNoPrestados = obtenerNumLibrosNoPrestados(db);
+    printf("Numero de libros que no se han prestado: %d\n", numLibrosNoPrestados);
+
+    // Número de libros prestados
+    int numLibrosPrestados = obtenerNumLibrosPrestados(db);
+    printf("Numero de libros prestados: %d\n", numLibrosPrestados);
+
+    // Número de libros devueltos
+    int numLibrosDevueltos = obtenerNumLibrosDevueltos(db);
+    printf("Numero de libros devueltos: %d\n", numLibrosDevueltos);
+
+    // Número total de libros
+    int numTotalLibros = numLibrosNoPrestados + numLibrosPrestados + numLibrosDevueltos;
+    printf("Numero total de libros: %d\n", numTotalLibros);
+
+    int opcion;
+    do {
+        printf("1. Volver al Menu de Informes\n");
+        printf("2. Volver al Menu Principal\n");
+        printf("Seleccione una opcion: ");
+        scanf("%d", &opcion);
+        switch (opcion) {
+            case 1:
+                printf("Volviendo al Menu de Informes...\n");
+                return; // Sale de la función, volviendo al menú de informes
+            case 2:
+                printf("Volviendo al Menu Principal...\n");
+                return; // Sale de la función, volviendo al menú principal
+            default:
+                printf("Opcion no válida. Por favor, seleccione una opcion valida.\n");
+                break;
+        }
+    } while (opcion != 1 && opcion != 2);
+}
+
+
+// MENU PRINCIPAL
+
 void ejecutarMenuConfiguracion(sqlite3* db){
     int opcion; 
     do{
@@ -606,7 +946,7 @@ void ejecutarMenuPrincipal(sqlite3* db) {
                 ejecutarMenuConfiguracion(db);
                 break;
             case 5:
-                // Lógica para ejecutar el menú de generación de informes
+                ejecutarMenuInformes(db);
                 break;
             case 6:
                 printf("Saliendo del programa...\n");
@@ -619,6 +959,4 @@ void ejecutarMenuPrincipal(sqlite3* db) {
 }
 
 
-
-
-       
+ 
