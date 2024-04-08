@@ -1,0 +1,3 @@
+DuracionMaximaPrestamo= 
+CantidadMaximaLibros= 
+MultaDevolucionTardia=2

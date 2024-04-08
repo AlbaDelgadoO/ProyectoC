@@ -480,6 +480,7 @@ void crearFicheroLog(){
     
 }
 
+
 void leerFicheroConfiguracion(){
     FILE*archivo;
     char linea[100];
@@ -499,10 +500,9 @@ void leerFicheroConfiguracion(){
 
 void mostrarMenuConfiguracionFicheros(){
     printf("=== Fichero de configuracion ===\n");
-    printf("1. Leer Fichero \n");
-    printf("2. Modificar Fichero\n");
-    printf("3. Volver al Menu de Configuracion del Sistema\n");
-    printf("Seleccione una opcion: \n");
+    printf("1. Leer Fichero de configuracion con las rutas del los archivos del programa \n");
+    printf("2. Volver al Menu de Configuracion del Sistema\n");
+    printf("Seleccione una opcion: ");
 }
 
 void ejecutarMenuConfiguracionFicheros(sqlite3*db){
@@ -513,37 +513,94 @@ void ejecutarMenuConfiguracionFicheros(sqlite3*db){
         switch(opcion){
             case 1:
                 leerFicheroConfiguracion();
-            case 2:
                 break;
             default:
                 printf("Opcion no valida. Por favor, seleccione una opcion valida.\n");
                 break;
             
         }
-    }while (opcion !=3);
+    }while (opcion !=2);
+}
+
+void actualizarParametros(const char *clave, const char *nuevoValor){
+    FILE *archivo = fopen("politicas.txt", "r");
+    if(!archivo){
+        printf("No se pudo encontrar el archivo");
+        return;
+    }
+   
+   FILE *temp = fopen("politicas_temp.txt", "w");
+   if(!temp){
+    printf("No se pudo abrir el archivo temporal para la escritura de los cambios");
+    fclose(archivo);
+    return;
+   }
+
+   char linea[100];
+   int claveActualizada= 0;
+
+   while (fgets(linea, sizeof(linea), archivo) != NULL)
+   { 
+    char copiaLinea[100];
+    strcpy(copiaLinea, linea);
+    char *token = strtok(copiaLinea, "=\n");
+
+    if( token != NULL && strcmp(token, clave)== 0){
+        fprintf(temp, "%s= %s\n", clave, nuevoValor);
+        claveActualizada=1;
+    }else{
+        fprintf(temp, "%s", linea);
+    }
+   }
+   
+    fclose(archivo);
+    fclose(temp);
+
+   remove("politicas.txt");
+   rename("politicas_temp.txt", "politicas.txt");
+   
+
+   if(claveActualizada==1){
+    printf("Configuracion '%s' actualizada con exito \n", clave);
+   }else{
+    printf("Clave '%s' no encontrada\n", clave );
+   }
+   
 }
 void mostrarMenuConfiguracionParametros(){
-    printf("=== Configuracion de Variables y Parametros del Sistema ===\n");
+    printf("=== Configuracion de Politicas y Parametros del Sistema ===\n");
     printf("1. Configurar duracion maxima de prestamo \n");
-    printf("2. Configurar cantidad maxima de libros prestados\n");
+    printf("2. Configurar cantidad maxima de libros prestados por usuario al dia\n");
     printf("3. Configurar multa por devolucion tardia\n");
     printf("4. Volver al Menu de Configuracion del Sistema \n");
-    printf("Seleccione una opcion: \n");
+    printf("Seleccione una opcion: ");
 
 }
 
 void ejecutarMenuConfiguracionParametros(sqlite3* db){
     int opcion;
+    char nuevoValor[50];
      do{
        mostrarMenuConfiguracionParametros();
         scanf("%d", &opcion);
         switch (opcion){
         case 1:
+            printf("Ingrese la nueva direccion maxima de prestamo (en dias): ");
+            scanf("%d", nuevoValor);
+            actualizarParametros("DuracionMaximaPrestamo", nuevoValor);
             
             break;
         case 2: 
+            printf("Ingrese la nueva cantidad maxima de libros prestados por usuario: ");
+            scanf("%d", nuevoValor);
+            actualizarParametros("CantidadMaximaLibros", nuevoValor);
+            
             break;
         case 3:
+            printf("Ingrese el nuevo numero de dias de sanción en caso de devolución tardia por dia: ");
+            scanf("%d", nuevoValor);
+            actualizarParametros("MultaDevolucionTardia", nuevoValor);
+            
             break;
         case 4: 
             printf("Volviendo al Menu de Configuracioon del Sistema...\n");
@@ -559,7 +616,7 @@ void ejecutarMenuConfiguracionParametros(sqlite3* db){
 void mostrarMenuConfiguracion(){
     printf("=== Configuracion Del Sistema ===\n");
     printf("1. Fichero de Configuracion\n");
-    printf("2. Parametros del Sistema\n");
+    printf("2. Politicas y Parametros del Sistema\n");
     printf("3. Volver al Menu Principal\n");
     printf("Selccione una opcion: ");
 
