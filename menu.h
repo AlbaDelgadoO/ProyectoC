@@ -39,7 +39,7 @@ void generarInformeLibros(sqlite3* db);
 
 /*
 
-Generacion de informes
+GENERACION DE INFORMES
 
 USUARIOS
 
