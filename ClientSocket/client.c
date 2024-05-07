@@ -17,9 +17,11 @@ void clearIfNeeded(char *str, int max_line)
 
 char mostrarMenu()
 {
-	printf("1. CargarUsuarios\n");
-	printf("2. NuevoUsuario\n");
-	printf("3. EliminarUsuario\n");
+	printf("1. Gestion de Libros\n");
+    printf("2. Gestion de Usuarios\n");
+    printf("3. Gestion de Prestamos\n");
+    printf("4. Configuracion del Sistema\n");
+    printf("5. Generacion de Informes\n");
 	printf("Pulsar 'q' para salir\n");
 	printf("\n");
 	printf("Opcion: ");
