@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 		opcion = mostrarMenu();
 		switch (opcion){
 			case '1':
-				printf("Mostrar Usuarios \n");
+				printf("Gestion de Libros \n");
 				strcpy(sendBuff, "PedirUsuarios");
 				send(s, sendBuff, sizeof(sendBuff), 0);
 				recv(s, recvBuff, sizeof(recvBuff), 0);
@@ -85,10 +85,31 @@ int main(int argc, char *argv[]) {
 
 				break;
 			case '2':
+				printf("Gestion de Usuarios \n");
+				strcpy(sendBuff, "PedirUsuarios");
+				send(s, sendBuff, sizeof(sendBuff), 0);
+				recv(s, recvBuff, sizeof(recvBuff), 0);
+				printf("Usuarios: %s \n", recvBuff);
 				break;
 			case '3':
-				printf("Eliminar Usuarios \n");
+				printf("Gestion de Prestamos \n");
 				strcpy(sendBuff, "EliminarUsuario");
+				send(s, sendBuff, sizeof(sendBuff), 0);
+				strcpy(sendBuff, "01");
+				send(s, sendBuff, sizeof(sendBuff), 0);
+				break;
+
+			case '4':
+				printf("Configuracion del Sistema \n");
+				strcpy(sendBuff, "EliminarUsuario");
+				send(s, sendBuff, sizeof(sendBuff), 0);
+				strcpy(sendBuff, "01");
+				send(s, sendBuff, sizeof(sendBuff), 0);
+				break;
+
+			case '5':
+				printf("Generacion de Informes \n");
+				strcpy(sendBuff, "GenerarInforme");
 				send(s, sendBuff, sizeof(sendBuff), 0);
 				strcpy(sendBuff, "01");
 				send(s, sendBuff, sizeof(sendBuff), 0);
