@@ -179,7 +179,7 @@ int main(int argc, char *argv[]) {
                 int nEjemplares, aPubl, cod_E;
                 switch (opcionInformes)
                 {
-                    case '1': 
+                    if(opcionInformes == '1') { 
                         // Enviar el mensaje "informe de usuario" al servidor
                         strcpy(sendBuff, "informeUsuario");
                         send(s, sendBuff, sizeof(sendBuff), 0);
@@ -187,8 +187,8 @@ int main(int argc, char *argv[]) {
                         // Esperar la respuesta del servidor
                         recv(s, recvBuff, sizeof(recvBuff), 0);
                         std::cout << "Respuesta del servidor: " << recvBuff << "\n";
-                        break;
-                    case '2':
+                        
+                    }else if(opcionInformes == '2') {
                         // Enviar el mensaje "informe de prestamos" al servidor
                         strcpy(sendBuff, "informePrestamos");
                         send(s, sendBuff, sizeof(sendBuff), 0);
@@ -197,7 +197,7 @@ int main(int argc, char *argv[]) {
                         recv(s, recvBuff, sizeof(recvBuff), 0);
                         std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                         break;
-                    case '3':
+                    }else if(opcionInformes == '3') {
                         // Enviar el mensaje "informe de libros" al servidor
                         strcpy(sendBuff, "informeLibros");
                         send(s, sendBuff, sizeof(sendBuff), 0);
@@ -206,10 +206,10 @@ int main(int argc, char *argv[]) {
                         recv(s, recvBuff, sizeof(recvBuff), 0);
                         std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                         break;
-                    case '4':
+                    }else if(opcionInformes == '4') {
                         //Codigo para volver al menu principal
                         break;
-                    default:
+                    }else {
                         std::cout << "Opcion invalida\n";
                         break;
                 }
