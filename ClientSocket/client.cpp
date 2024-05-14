@@ -87,61 +87,62 @@ int main(int argc, char *argv[]) {
 
                     std::string isbn, titulo, genero, autor, apellido;
                     int nEjemplares, aPubl, cod_E;
-                    switch (opcionLibros)
+                    if(opcionLibros == '1') 
                     {
-                        case '1':
-                            //Codigo para agregar un libro
-                            std::cout << "Ingrese los detalles del libro:\n";
+                        //Codigo para agregar un libro
+                        std::cout << "Ingrese los detalles del libro:\n";
 
-                            std::cout << "ISBN: ";
-                            std::cin >> isbn;
-                            std::cout << "Titulo: ";
-                            std::cin >> titulo;
-                            std::cout << "Genero: ";
-                            std::cin >> genero;
-                            std::cout << "Nombre del autor: ";
-                            std::cin >> autor;
-                            std::cout << "Apellido del autor: ";
-                            std::cin >> apellido;
-                            std::cout << "Numero de ejemplares: ";
-                            std::cin >> nEjemplares;
-                            std::cout << "Anyo de publicacion: ";
-                            std::cin >> aPubl;
-                            std::cout << "Codigo de editorial: ";
-                            std::cin >> cod_E;
+                        std::cout << "ISBN: ";
+                        std::cin >> isbn;
+                        std::cout << "Titulo: ";
+                        std::cin >> titulo;
+                        std::cout << "Genero: ";
+                        std::cin >> genero;
+                        std::cout << "Nombre del autor: ";
+                        std::cin >> autor;
+                        std::cout << "Apellido del autor: ";
+                        std::cin >> apellido;
+                        std::cout << "Numero de ejemplares: ";
+                        std::cin >> nEjemplares;
+                        std::cout << "Anyo de publicacion: ";
+                        std::cin >> aPubl;
+                        std::cout << "Codigo de editorial: ";
+                        std::cin >> cod_E;
 
-                             // Enviar el mensaje "AgregarLibro" al servidor
-                            strcpy(sendBuff, "AgregarLibro");
-                            send(s, sendBuff, sizeof(sendBuff), 0);
+                            // Enviar el mensaje "AgregarLibro" al servidor
+                        strcpy(sendBuff, "AgregarLibro");
+                        send(s, sendBuff, sizeof(sendBuff), 0);
 
-                            // Enviar los detalles del libro al servidor
-                            send(s, isbn.c_str(), strlen(isbn.c_str()), 0);
-                            send(s, titulo.c_str(), strlen(titulo.c_str()), 0);
-                            send(s, genero.c_str(), strlen(genero.c_str()), 0);
-                            send(s, autor.c_str(), strlen(autor.c_str()), 0);
-                            send(s, apellido.c_str(), strlen(apellido.c_str()), 0);
-                            send(s, std::to_string(nEjemplares).c_str(), std::to_string(nEjemplares).length(), 0);
-                            send(s, std::to_string(aPubl).c_str(), std::to_string(aPubl).length(), 0);
-                            send(s, std::to_string(cod_E).c_str(), std::to_string(cod_E).length(), 0);
+                        // Enviar los detalles del libro al servidor
+                        send(s, isbn.c_str(), strlen(isbn.c_str()), 0);
+                        send(s, titulo.c_str(), strlen(titulo.c_str()), 0);
+                        send(s, genero.c_str(), strlen(genero.c_str()), 0);
+                        send(s, autor.c_str(), strlen(autor.c_str()), 0);
+                        send(s, apellido.c_str(), strlen(apellido.c_str()), 0);
+                        send(s, std::to_string(nEjemplares).c_str(), std::to_string(nEjemplares).length(), 0);
+                        send(s, std::to_string(aPubl).c_str(), std::to_string(aPubl).length(), 0);
+                        send(s, std::to_string(cod_E).c_str(), std::to_string(cod_E).length(), 0);
 
-                            // Esperar la respuesta del servidor
-                            recv(s, recvBuff, sizeof(recvBuff), 0);
-                            std::cout << "Respuesta del servidor: " << recvBuff << "\n";
-                            break;
-                        case '2':
-                            //Codigo para leer libros
-                            break;
-                        case '3':
-                            //Codigo para buscar un libro
-                            break;
-                        case '4':
-                            //Codigo para volver al menu principal
-                            break;
-                        default:
-                            std::cout << "Opcion invalida\n";
-                            break;
+                        // Esperar la respuesta del servidor
+                        recv(s, recvBuff, sizeof(recvBuff), 0);
+                        std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                     }
-                    break;
+                    else if(opcionLibros == '2')
+                    {
+                        //Codigo para leer libros
+                    } 
+                    else if(opcionLibros == '3')
+                    {
+                        //Codigo para buscar un libro
+                    } 
+                    else if(opcionLibros == '4')
+                    {
+                        //Codigo para volver al menu principal
+                    } 
+                    else
+                    {
+                        std::cout << "Opcion invalida\n";
+                    }
                 }while(opcionLibros != '4');
         case '2':
             std::cout << "Gestion de Usuarios \n";
