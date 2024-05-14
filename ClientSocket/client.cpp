@@ -153,10 +153,53 @@ int main(int argc, char *argv[]) {
             break;
         case '3':
             std::cout << "Gestion de Prestamos \n";
-            strcpy(sendBuff, "EliminarUsuario");
-            send(s, sendBuff, sizeof(sendBuff), 0);
-            strcpy(sendBuff, "01");
-            send(s, sendBuff, sizeof(sendBuff), 0);
+            char opcionPrestamos;
+            do {            
+                std::cout << "\n=== Menu de Gestion de Prestamos ===\n";
+                std::cout << "1. Agregar Nuevo Prestamo\n";
+                std::cout << "2. Renovar Prestamo Existente\n";
+                std::cout << "3. Registrar Devolucion de Libro\n";
+                std::cout << "4. Gestionar Problemas de Prestamo\n";
+                std::cout << "5. Volver al Menu Principal\n";
+                std::cout << "Seleccione una opcion: ";
+                std::cin >> opcionPrestamos; // Captura la opción seleccionada por el usuario
+
+                if (opcionPrestamos == '1') {
+                    // Código para agregar un nuevo préstamo
+                    std::string idLibro, idUsuario, fechaVencimiento;
+
+                    // Solicitar detalles del nuevo préstamo al usuario
+                    std::cout << "Ingrese el ID del libro: ";
+                    std::cin >> idLibro;
+                    std::cout << "Ingrese el ID del usuario: ";
+                    std::cin >> idUsuario;
+                    std::cout << "Ingrese la fecha de vencimiento (AAAA-MM-DD): ";
+                    std::cin >> fechaVencimiento;
+
+                    // Enviar el mensaje "AgregarPrestamo" al servidor
+                    strcpy(sendBuff, "AgregarPrestamo");
+                    send(s, sendBuff, sizeof(sendBuff), 0);
+
+                    // Enviar los detalles del préstamo al servidor
+                    send(s, idLibro.c_str(), strlen(idLibro.c_str()), 0);
+                    send(s, idUsuario.c_str(), strlen(idUsuario.c_str()), 0);
+                    send(s, fechaVencimiento.c_str(), strlen(fechaVencimiento.c_str()), 0);
+
+                    // Esperar la respuesta del servidor
+                    recv(s, recvBuff, sizeof(recvBuff), 0);
+                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+                } else if (opcionPrestamos == '2') {
+                    // Código para renovar un préstamo existente
+                } else if (opcionPrestamos == '3') {
+                    // Código para registrar la devolución de un libro
+                } else if (opcionPrestamos == '4') {
+                    // Código para gestionar problemas de préstamo
+                } else if (opcionPrestamos == '5') {
+                    std::cout << "Volviendo al Menu Principal...\n";
+                } else {
+                    std::cout << "Opcion no valida. Por favor, seleccione una opcion valida.\n";
+                }
+            } while (opcionPrestamos != '5');
             break;
 
         case '4':
