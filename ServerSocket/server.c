@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
 			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 
 			// Procesar la solicitud del cliente
-			if (strcmp(recvBuff, "informeUsuario") == 0) {
+			else if (strcmp(recvBuff, "informeUsuario") == 0) {
 				// Lógica para generar el informe de usuarios
 				generarInformeUsuarios(db);
 				// Enviar confirmación al cliente de que el libro ha sido insertado
