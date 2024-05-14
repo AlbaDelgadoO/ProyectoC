@@ -4,6 +4,7 @@
 #include "menu.h"
 #include "dataBase.h"
 
+/*
 int main() {
     sqlite3* db;
 
@@ -33,4 +34,4 @@ int main() {
     sqlite3_close(db);
 
     return 0;
-}
+}*/

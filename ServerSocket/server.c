@@ -2,11 +2,26 @@
 
 #include <stdio.h>
 #include <winsock2.h>
+#include "../menu.h"
+#include "../dataBase.h"
+#include "../sqlite3.h"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
 
 int main(int argc, char *argv[]) {
+
+	// Inicializar la base de datos
+	sqlite3* db;
+    db = inicializarBaseDatos("biblioteca.db");
+	// Crear tabla de libros si no existe
+    crearTablaLibro(db);
+    // Crear tabla usuario
+    crearTablaUsuario(db);
+    //Crear tabla prestamo
+    crearTablaPrestamo(db);
+    // Crear tabla Autor
+    crearTablaAutor(db);
 
 	WSADATA wsaData;
 	SOCKET conn_socket;
@@ -77,12 +92,45 @@ int main(int argc, char *argv[]) {
 	do {
 		int bytes = recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 		if (bytes > 0) {
-			if(strcmp(recvBuff, "PedirUsuarios") == 0)
+			//GESTION DE LIBROS
+			if(strcmp(recvBuff, "AgregarLibro") == 0)
 			{
-				//Llamada a bbdd
-				//devolver usuarios
-				strcpy(sendBuff, "01,Iker;02,Asier");
-				send(comm_socket, sendBuff, sizeof(sendBuff), 0);
+				//Codigo para agregar un libro
+				// Recibir los detalles del libro del cliente
+				char isbn[15], titulo[100], genero[100], autor[100], apellido[100], nEjemplaresStr[20], aPublStr[20], cod_EStr[20];
+				int nEjemplares, aPubl, cod_E;
+
+				// Recibir los detalles del libro del cliente
+				recv(comm_socket, isbn, sizeof(isbn), 0);
+				recv(comm_socket, titulo, sizeof(titulo), 0);
+				recv(comm_socket, genero, sizeof(genero), 0);
+				recv(comm_socket, autor, sizeof(autor), 0);
+				recv(comm_socket, apellido, sizeof(apellido), 0);
+				recv(comm_socket, nEjemplaresStr, sizeof(nEjemplaresStr), 0);
+				recv(comm_socket, aPublStr, sizeof(aPublStr), 0);
+				recv(comm_socket, cod_EStr, sizeof(cod_EStr), 0);
+
+				// Convertir las cadenas a enteros
+				nEjemplares = atoi(nEjemplaresStr);
+				aPubl = atoi(aPublStr);
+				cod_E = atoi(cod_EStr);
+
+				// Crear una instancia de Libro con los detalles ingresados por el usuario
+				Libro nuevoLibro;
+				strcpy(nuevoLibro.ISBN, isbn);
+				strcpy(nuevoLibro.titulo, titulo);
+				strcpy(nuevoLibro.genero, genero);
+				strcpy(nuevoLibro.nom_autor, autor);
+				strcpy(nuevoLibro.apellido_autor, apellido);
+				nuevoLibro.numEjemplares = nEjemplares;
+				nuevoLibro.anyoPublicacion = aPubl;
+				nuevoLibro.cod_Editorial = cod_E;
+
+				// Insertar el nuevo libro en la base de datos
+				insertarLibro(db, nuevoLibro);
+				// Enviar confirmación al cliente de que el libro ha sido insertado
+				const char* confirmacion = "Libro insertado correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
 			if(strcmp(recvBuff, "Bye") == 0)
 			{
