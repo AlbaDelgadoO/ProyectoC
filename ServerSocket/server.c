@@ -137,6 +137,33 @@ int main(int argc, char *argv[]) {
 				//Llamada a bbdd
 				//devolver usuarios
 			}
+
+			//GENERACION DE INFORMES
+			// Esperar a que llegue un mensaje del cliente
+			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+
+			// Procesar la solicitud del cliente
+			if (strcmp(recvBuff, "informeUsuario") == 0) {
+				// Lógica para generar el informe de usuarios
+				generarInformeUsuarios(db);
+				// Enviar confirmación al cliente de que el libro ha sido insertado
+				const char* confirmacion = "Informe de usuario generado correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			} else if (strcmp(recvBuff, "informePrestamos") == 0) {
+				// Lógica para generar el informe de préstamos
+				generarInformePrestamos(db);
+				const char* confirmacion = "Informe de prestamos generado correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			} else if (strcmp(recvBuff, "informeLibros") == 0) {
+				// Lógica para generar el informe de libros
+				generarInformeLibros(db);
+				const char* confirmacion = "Informe de usuario libros correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			} else {
+				// Mensaje de solicitud no reconocida
+				const char* mensajeError = "Solicitud no reconocida";
+				send(comm_socket, mensajeError, strlen(mensajeError), 0);
+			}
 		
 			if (strcmp(recvBuff, "Bye") == 0)
 				break;
