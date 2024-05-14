@@ -1,3 +1,4 @@
+//para ejecutar: g++ client.cpp -o client.exe -lws2_32  
 #include <iostream>
 #include <string>
 #include <winsock2.h>

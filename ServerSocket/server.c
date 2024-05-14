@@ -1,5 +1,5 @@
 // IMPORTANT: Winsock Library ("ws2_32") should be linked
-
+//para ejecutar: gcc server.c ../*.c -o server.exe -lws2_32
 #include <stdio.h>
 #include <winsock2.h>
 #include "../menu.h"
