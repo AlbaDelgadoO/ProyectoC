@@ -190,6 +190,22 @@ int main(int argc, char *argv[]) {
                     std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                 } else if (opcionPrestamos == '2') {
                     // Código para renovar un préstamo existente
+                    std::string idPrestamo;
+
+                    // Solicitar al usuario el ID del préstamo que desea renovar
+                    std::cout << "Ingrese el ID del préstamo que desea renovar: ";
+                    std::cin >> idPrestamo;
+
+                    // Enviar el mensaje "RenovarPrestamo" al servidor
+                    strcpy(sendBuff, "RenovarPrestamo");
+                    send(s, sendBuff, sizeof(sendBuff), 0);
+
+                    // Enviar el ID del préstamo al servidor
+                    send(s, idPrestamo.c_str(), strlen(idPrestamo.c_str()), 0);
+
+                    // Esperar la respuesta del servidor
+                    recv(s, recvBuff, sizeof(recvBuff), 0);
+                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                 } else if (opcionPrestamos == '3') {
                     // Código para registrar la devolución de un libro
                 } else if (opcionPrestamos == '4') {
