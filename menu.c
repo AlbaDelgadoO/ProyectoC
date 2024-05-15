@@ -271,28 +271,16 @@ void agregarNuevoPrestamo(sqlite3* db) {
     char fechaVencimiento[11];
     scanf("%10s", fechaVencimiento);
 
-    // Insertar el nuevo préstamo en la base de datos
-    char* sql = "INSERT INTO Prestamo (ISBN_Libro, ID_Usuario, Fecha_Vencimiento) VALUES (?, ?, ?)";
-    sqlite3_stmt* stmt;
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
-        return;
-    }
+    // Crear una instancia de Prestamo
+    Prestamo nuevoPrestamo;
 
-    sqlite3_bind_text(stmt, 1, idLibro, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, idUsuario, -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, fechaVencimiento, -1, SQLITE_STATIC);
+    // Asignar valores al prestamo
+    strcpy(nuevoPrestamo.ISBN, idLibro);
+    strcpy(nuevoPrestamo.ID_Usuario, idUsuario);
+    strcpy(nuevoPrestamo.fechaDevolucion, fechaVencimiento);
 
-    if (sqlite3_step(stmt) != SQLITE_DONE) {
-        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
-        printf("Por favor, revise que el ISBN introducido es válido\n\n");
+    insertarPrestamo(db, nuevoPrestamo);
 
-    } else {
-        printf("El nuevo prestamo ha sido agregado correctamente.\n\n");
-    }
-
-
-    sqlite3_finalize(stmt);
 }
 
 // Función para obtener la nueva fecha de vencimiento extendida por 15 días

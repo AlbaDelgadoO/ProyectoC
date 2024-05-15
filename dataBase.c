@@ -517,6 +517,32 @@ void crearTablaPrestamo(sqlite3* db) {
     }
 }
 
+void insertarPrestamo(sqlite3* db, Prestamo p)
+{
+    // Insertar el nuevo préstamo en la base de datos
+    char* sql = "INSERT INTO Prestamo (ISBN_Libro, ID_Usuario, Fecha_Vencimiento) VALUES (?, ?, ?)";
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    sqlite3_bind_text(stmt, 1, p.ISBN, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, p.ID_Usuario, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, p.fechaDevolucion, -1, SQLITE_STATIC);
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+        printf("Por favor, revise que el ISBN introducido es válido\n\n");
+
+    } else {
+        printf("El nuevo prestamo ha sido agregado correctamente.\n\n");
+    }
+
+
+    sqlite3_finalize(stmt);
+}
+
 //TABLA AUTOR
 void crearTablaAutor(sqlite3* db){
     char* sql = "CREATE TABLE IF NOT EXISTS Autor(ID INTEGER PRIMARY KEY AUTOINCREMENT, Nombre TEXT, Apellido TEXT)";

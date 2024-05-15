@@ -36,7 +36,7 @@ typedef struct {
     char fechaDevolucion[20];
     char Estado[20];
     char ISBN[13];
-    int ID_Usuario;
+    char ID_Usuario[13];
 } Prestamo;
 
 

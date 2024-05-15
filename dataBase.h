@@ -26,6 +26,7 @@ void ejecutarMenuEdicion(sqlite3* db, char* id);
 void editarUsuarioDB(sqlite3* db, char* id);
 void borrarUsuarioDB(sqlite3 *db, char* id);
 void crearTablaPrestamo(sqlite3* db);
+void insertarPrestamo(sqlite3* db, Prestamo p);
 
 //AUTOR
 void insertarAutor(sqlite3*db, Libro libro);

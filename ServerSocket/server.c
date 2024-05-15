@@ -135,18 +135,22 @@ int main(int argc, char *argv[]) {
 			// GESTIÓN DE PRESTAMOS
 			if (strcmp(recvBuff, "AgregarPrestamo") == 0) {
 				// Código para agregar un nuevo préstamo
-				char idLibro[20], idUsuario[20], fechaVencimiento[20];
+				char idLibro[13], idUsuario[13], fechaVencimiento[20];
 
 				// Recibir los detalles del préstamo del cliente
 				recv(comm_socket, idLibro, sizeof(idLibro), 0);
 				recv(comm_socket, idUsuario, sizeof(idUsuario), 0);
 				recv(comm_socket, fechaVencimiento, sizeof(fechaVencimiento), 0);
 
-				// Insertar el nuevo préstamo en la base de datos
-				// Aquí debes implementar la lógica para insertar el préstamo en la base de datos
-				// Puedes utilizar las funciones de tu API de base de datos (SQLite en este caso)
-				// No tengo acceso a tu implementación específica, así que no puedo proporcionar el código exacto
-				// Pero deberías realizar una inserción en la tabla Prestamo con los valores recibidos del cliente
+
+				// Crear una instancia de Prestamo con los detalles ingresados por el usuario
+				Prestamo nuevoPrestamo;
+				strcpy(nuevoPrestamo.ISBN, idLibro);
+				strcpy(nuevoPrestamo.ID_Usuario, idUsuario);
+				strcpy(nuevoPrestamo.fechaDevolucion, fechaVencimiento);
+
+				// Insertar el nuevo prestamo en la base de datos
+				insertarPrestamo(db, nuevoPrestamo);
 
 				// Enviar confirmación al cliente de que el préstamo ha sido insertado
 				const char* confirmacion = "Prestamo insertado correctamente";
