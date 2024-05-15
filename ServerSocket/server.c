@@ -156,6 +156,20 @@ int main(int argc, char *argv[]) {
 				const char* confirmacion = "Prestamo insertado correctamente";
 				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
+			if (strcmp(recvBuff, "RenovarPrestamo") == 0) {
+				// Código para renovar un préstamo existente
+				char idLibro[20];
+
+				// Recibir el ID del libro del cliente
+				recv(comm_socket, idLibro, sizeof(idLibro), 0);
+
+				// Renovar el préstamo asociado al libro en la base de datos
+				
+
+				// Enviar confirmación al cliente de que el préstamo ha sido renovado
+				const char* confirmacion = "Préstamo renovado correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			}
 
 			if(strcmp(recvBuff, "Bye") == 0)
 			{
