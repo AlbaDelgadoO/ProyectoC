@@ -164,7 +164,7 @@ int main(int argc, char *argv[]) {
 				recv(comm_socket, idLibro, sizeof(idLibro), 0);
 
 				// Renovar el préstamo asociado al libro en la base de datos
-				
+				renovarPrestamoDB(db, idLibro);
 
 				// Enviar confirmación al cliente de que el préstamo ha sido renovado
 				const char* confirmacion = "Préstamo renovado correctamente";

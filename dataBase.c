@@ -543,6 +543,42 @@ void insertarPrestamo(sqlite3* db, Prestamo p)
     sqlite3_finalize(stmt);
 }
 
+void renovarPrestamoDB(sqlite3* db, char* idLibro) {
+    // Consultar la fecha de vencimiento actual del préstamo asociado al libro
+    char selectSql[200];
+    sprintf(selectSql, "SELECT Fecha_Vencimiento FROM Prestamo WHERE ISBN_Libro = '%s'", idLibro);
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    // Si existe un préstamo asociado al libro, actualizar la fecha de vencimiento
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        const char* fechaVencimientoActual = (const char*)sqlite3_column_text(stmt, 0);
+
+        // Calcular la nueva fecha de vencimiento extendida por 15 días
+        char* nuevaFechaVencimiento = calcularNuevaFechaVencimiento(fechaVencimientoActual);
+
+        // Actualizar la fecha de vencimiento en la base de datos
+        char updateSql[200];
+        sprintf(updateSql, "UPDATE Prestamo SET Fecha_Vencimiento = '%s' WHERE ISBN_Libro = '%s'", nuevaFechaVencimiento, idLibro);
+        int updateResult = sqlite3_exec(db, updateSql, NULL, 0, NULL);
+        if (updateResult != SQLITE_OK) {
+            printf("Error al actualizar la fecha de vencimiento: %s\n", sqlite3_errmsg(db));
+            return;
+        }
+
+        printf("El prestamo del libro con ID %s ha sido renovado con exito.\n\n", idLibro);
+    } else {
+        printf("No se encontro un prestamo asociado al libro con ID %s.\n", idLibro);
+    }
+
+    // Liberar la consulta preparada
+    sqlite3_finalize(stmt);
+}
+
 //TABLA AUTOR
 void crearTablaAutor(sqlite3* db){
     char* sql = "CREATE TABLE IF NOT EXISTS Autor(ID INTEGER PRIMARY KEY AUTOINCREMENT, Nombre TEXT, Apellido TEXT)";
