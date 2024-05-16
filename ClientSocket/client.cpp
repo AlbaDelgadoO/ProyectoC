@@ -213,6 +213,22 @@ int main(int argc, char *argv[]) {
                     std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                 } else if (opcionPrestamos == '3') {
                     // Código para registrar la devolución de un libro
+                    std::string idLibro;
+
+                    // Solicitar al usuario el ID del libro que se está devolviendo
+                    std::cout << "Ingrese el ID del libro que desea devolver: ";
+                    std::cin >> idLibro;
+
+                    // Enviar el mensaje "DevolverLibro" al servidor
+                    strcpy(sendBuff, "DevolverLibro");
+                    send(s, sendBuff, sizeof(sendBuff), 0);
+
+                    // Enviar el ID del libro al servidor
+                    send(s, idLibro.c_str(), strlen(idLibro.c_str()), 0);
+
+                    // Esperar la respuesta del servidor
+                    recv(s, recvBuff, sizeof(recvBuff), 0);
+                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                 } else if (opcionPrestamos == '4') {
                     // Código para gestionar problemas de préstamo
                 } else if (opcionPrestamos == '5') {
