@@ -171,13 +171,7 @@ int main(int argc, char *argv[]) {
 				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
 
-			if(strcmp(recvBuff, "Bye") == 0)
-			{
-				//Llamada a bbdd
-				//devolver usuarios
-			}
-
-			//GENERACION DE INFORMES
+						//GENERACION DE INFORMES
 			// Esperar a que llegue un mensaje del cliente
 			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 
