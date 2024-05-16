@@ -5,7 +5,7 @@
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
-#define MAX_LINE 10
+#define MAX_LINE 100
 
 void clearIfNeeded(std::string &str, int max_line)
 {
@@ -91,17 +91,21 @@ int main(int argc, char *argv[]) {
                     {
                         //Codigo para agregar un libro
                         std::cout << "Ingrese los detalles del libro:\n";
-
                         std::cout << "ISBN: ";
-                        std::cin >> isbn;
+                        std::getline(std::cin >> std::ws, isbn);
+                        clearIfNeeded(isbn, MAX_LINE);
                         std::cout << "Titulo: ";
-                        std::cin >> titulo;
+                        std::getline(std::cin >> std::ws, titulo);
+                        clearIfNeeded(titulo, MAX_LINE);
                         std::cout << "Genero: ";
-                        std::cin >> genero;
+                        std::getline(std::cin >> std::ws, genero);
+                        clearIfNeeded(genero, MAX_LINE);
                         std::cout << "Nombre del autor: ";
-                        std::cin >> autor;
+                        std::getline(std::cin >> std::ws, autor);
+                        clearIfNeeded(autor, MAX_LINE);
                         std::cout << "Apellido del autor: ";
-                        std::cin >> apellido;
+                        std::getline(std::cin >> std::ws, apellido);
+                        clearIfNeeded(apellido, MAX_LINE);
                         std::cout << "Numero de ejemplares: ";
                         std::cin >> nEjemplares;
                         std::cout << "Anyo de publicacion: ";
@@ -109,7 +113,7 @@ int main(int argc, char *argv[]) {
                         std::cout << "Codigo de editorial: ";
                         std::cin >> cod_E;
 
-                            // Enviar el mensaje "AgregarLibro" al servidor
+                        // Enviar el mensaje "AgregarLibro" al servidor
                         strcpy(sendBuff, "AgregarLibro");
                         send(s, sendBuff, sizeof(sendBuff), 0);
 
@@ -144,6 +148,7 @@ int main(int argc, char *argv[]) {
                         std::cout << "Opcion invalida\n";
                     }
                 }while(opcionLibros != '4');
+                break;
         case '2':
             std::cout << "Gestion de Usuarios \n";
             strcpy(sendBuff, "PedirUsuarios");
