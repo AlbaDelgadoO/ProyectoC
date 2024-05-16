@@ -579,6 +579,39 @@ void renovarPrestamoDB(sqlite3* db, char* idLibro) {
     sqlite3_finalize(stmt);
 }
 
+bool registrarDevolucionLibro(sqlite3* db, char* idLibro) {
+    // Consultar la tabla Prestamo para verificar si hay préstamos activos para este libro
+    char selectSql[100];
+    sprintf(selectSql, "SELECT ID FROM Prestamo WHERE ISBN_Libro = '%s' AND Estado = 0", idLibro);
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return false;
+    }
+
+    // Ejecutar la consulta y verificar si hay resultados
+    bool prestamosActivos = false;
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        prestamosActivos = true;
+        int idPrestamo = sqlite3_column_int(stmt, 0);
+
+        // Actualizar el estado del préstamo a devuelto (Estado = 1)
+        char updateSql[100];
+        sprintf(updateSql, "UPDATE Prestamo SET Estado = 1 WHERE ID = %d", idPrestamo);
+        int updateResult = sqlite3_exec(db, updateSql, NULL, 0, NULL);
+        if (updateResult != SQLITE_OK) {
+            printf("Error al actualizar el estado del prestamo: %s\n", sqlite3_errmsg(db));
+            return false;
+        }
+    }
+
+    // Liberar la consulta preparada
+    sqlite3_finalize(stmt);
+
+    return prestamosActivos;
+}
+
 //TABLA AUTOR
 void crearTablaAutor(sqlite3* db){
     char* sql = "CREATE TABLE IF NOT EXISTS Autor(ID INTEGER PRIMARY KEY AUTOINCREMENT, Nombre TEXT, Apellido TEXT)";

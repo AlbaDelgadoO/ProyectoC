@@ -2,7 +2,7 @@
 #define DATABASE_H
 #include "EstructuraDatos.h"
 #include "sqlite3.h"
-
+#include <stdbool.h>
 
 sqlite3* inicializarBaseDatos(const char* nombreArchivo);
 void crearTablaLibro(sqlite3* db);
@@ -28,6 +28,7 @@ void borrarUsuarioDB(sqlite3 *db, char* id);
 void crearTablaPrestamo(sqlite3* db);
 void insertarPrestamo(sqlite3* db, Prestamo p);
 void renovarPrestamoDB(sqlite3* db, char* idLibro);
+bool registrarDevolucionLibro(sqlite3* db, char* idLibro);
 
 //AUTOR
 void insertarAutor(sqlite3*db, Libro libro);

@@ -167,9 +167,24 @@ int main(int argc, char *argv[]) {
 				renovarPrestamoDB(db, idLibro);
 
 				// Enviar confirmación al cliente de que el préstamo ha sido renovado
-				const char* confirmacion = "Préstamo renovado correctamente";
+				const char* confirmacion = "Prestamo renovado correctamente";
 				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
+			if (strcmp(recvBuff, "DevolverLibro") == 0) {
+				// Código para registrar la devolución de un libro
+				char idLibro[15];
+
+				// Recibir el ID del libro del cliente
+				recv(comm_socket, idLibro, sizeof(idLibro), 0);
+
+				// Llamar a la función en dataBase.c para registrar la devolución del libro
+				registrarDevolucionLibro(db, idLibro);
+
+				// Enviar confirmación al cliente de que la devolución ha sido registrada
+				const char* confirmacion = "Devolucion registrada correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			}
+
 
 						//GENERACION DE INFORMES
 			// Esperar a que llegue un mensaje del cliente
