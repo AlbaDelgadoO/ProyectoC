@@ -40,10 +40,9 @@ void ejecutarMenuConfiguracion(sqlite3* db);
 
 // Generación de informes
 void mostrarMenuInformes();
-void generarInformeUsuarios(sqlite3* db);
-void generarInformePrestamos(sqlite3* db);
-void generarInformeLibros(sqlite3* db);
-
+char* generarInformeUsuarios(sqlite3* db);
+char* generarInformePrestamos(sqlite3* db);
+char* generarInformeLibros(sqlite3* db);
 
 #endif /* MENU_H */
 

@@ -171,17 +171,24 @@ int main(int argc, char *argv[]) {
 				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
 
-						//GENERACION DE INFORMES
+			//GENERACION DE INFORMES
 			// Esperar a que llegue un mensaje del cliente
-			recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+			//recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 
 			// Procesar la solicitud del cliente
-			if (strcmp(recvBuff, "informeUsuario") == 0) {
+			else if (strcmp(recvBuff, "informeUsuario") == 0) {
 				// Lógica para generar el informe de usuarios
-				generarInformeUsuarios(db);
+				//generarInformeUsuarios(db);
 				// Enviar confirmación al cliente de que el libro ha sido insertado
-				const char* confirmacion = "Informe de usuario generado correctamente";
-				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+				//const char* confirmacion = "Informe de usuario generado correctamente";
+				//send(comm_socket, confirmacion, strlen(confirmacion), 0);
+
+				printf("Cargando");
+				// Lógica para generar el informe de usuarios
+				char* informeUsuarios = generarInformeUsuarios(db);
+				// Enviar informe generado al cliente
+				send(comm_socket, informeUsuarios, strlen(informeUsuarios), 0);
+				free(informeUsuarios); // Liberar memoria del informe generado
 			} else if (strcmp(recvBuff, "informePrestamos") == 0) {
 				// Lógica para generar el informe de préstamos
 				generarInformePrestamos(db);

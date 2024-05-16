@@ -249,51 +249,70 @@ int main(int argc, char *argv[]) {
 
         case '5':
             char opcionInformes;
-            do{            
+            char opcionMenuInforme;
+            char continuar;
+            do {            
                 std::cout << "Generacion de Informes \n";
                 std::cout << "\n=== Menu de Informes ===\n1. Informe de Usuarios\n2. Informe de Prestamos\n3. Informe de Libros\n4. Volver al Menu Principal\n";
                 std::cout << "Seleccione una opcion: ";
                 std::cin >> opcionInformes; // Captura la opción seleccionada por el usuario
 
-                std::string isbn, titulo, genero, autor, apellido;
-                int nEjemplares, aPubl, cod_E;
                 if(opcionInformes == '1') { 
-                    // Enviar el mensaje "informe de usuario" al servidor
+                    // Enviar el mensaje "informeUsuario" al servidor
                     strcpy(sendBuff, "informeUsuario");
                     send(s, sendBuff, sizeof(sendBuff), 0);
 
                     // Esperar la respuesta del servidor
                     recv(s, recvBuff, sizeof(recvBuff), 0);
-                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
-                        
-                }else if(opcionInformes == '2') {
-                    // Enviar el mensaje "informe de prestamos" al servidor
+                    // Imprimir el informe en la consola del cliente
+                    std::cout << "Informe de usuarios:\n" << recvBuff << "\n";    
+                    
+                } else if(opcionInformes == '2') {
+                    // Enviar el mensaje "informePrestamos" al servidor
                     strcpy(sendBuff, "informePrestamos");
                     send(s, sendBuff, sizeof(sendBuff), 0);
 
                     // Esperar la respuesta del servidor
                     recv(s, recvBuff, sizeof(recvBuff), 0);
-                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
-                    break;
-                }else if(opcionInformes == '3') {
-                    // Enviar el mensaje "informe de libros" al servidor
+                    std::cout << "Informe de prestamos:\n" << recvBuff << "\n";
+
+                } else if(opcionInformes == '3') {
+                    // Enviar el mensaje "informeLibros" al servidor
                     strcpy(sendBuff, "informeLibros");
                     send(s, sendBuff, sizeof(sendBuff), 0);
 
                     // Esperar la respuesta del servidor
                     recv(s, recvBuff, sizeof(recvBuff), 0);
-                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
-                    break;
-                }else if(opcionInformes == '4') {
-                    //Codigo para volver al menu principal
-                    break;
-                }else {
+                    std::cout << "Informe de libros:\n" << recvBuff << "\n";
+
+                } else if(opcionInformes == '4') {
+                    // Código para volver al menú principal
+                    std::cout << "Volviendo al Menu Principal...\n";
+
+                } else {
                     std::cout << "Opcion invalida\n";
-                    break;
-                }
-                break;
-            }while(opcionInformes != '4');
-        
+/*                    do {
+                        std::cout << "1. Volver al Menu de Informes\n";
+                        std::cout << "2. Volver al Menu Principal\n";
+                        std::cout << "Seleccione una opcion: ";
+                        std::cin >> opcionMenuInforme;
+
+                        switch (opcionMenuInforme) {
+                            case 1:
+                                std::cout << "\nVolviendo al Menu de Informes...\n\n";
+                                break;
+                            case 2:
+                                std::cout << "\nVolviendo al Menu Principal...\n\n";
+                                break;
+                            default:
+                                std::cout << "\nOpcion no valida. Por favor, seleccione una opcion valida.\n\n";
+                                break;
+                        }
+                    } while (opcionMenuInforme != 1 && opcionMenuInforme != 2);
+*/                } 
+            } while(opcionInformes != '4');
+            break;
+    
     }
     std::cout << "Cerrando socket... \n";
     strcpy(sendBuff, "Bye");

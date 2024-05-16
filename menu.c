@@ -691,10 +691,28 @@ int contarUsuariosRegistrados(sqlite3* db) {
 }
 
 // Función para generar el informe de usuarios
-void generarInformeUsuarios(sqlite3* db) {
-    printf("\n=== Informe de Usuarios ===\n\n");
+char * generarInformeUsuarios(sqlite3* db) {
+    // Crear un buffer para almacenar el informe
+    char* informe = malloc(TAMANIO_MAXIMO_INFORME * sizeof(char));
+    if (informe == NULL) {
+        // Manejar el error de asignación de memoria
+        printf("Error: No se pudo asignar memoria para el informe.\n");
+        return NULL;
+    }
+    
+    // Inicializar el buffer del informe
+    informe[0] = '\0';
+
+    // Concatenar cada parte del informe al buffer
+    strcat(informe, "\n=== Informe de Usuarios ===\n");
+
     // Usuario que no haya realizado ningún préstamo
-    printf("Usuarios sin prestamos:\n");
+    strcat(informe, "Usuarios sin prestamos:\n");
+
+
+    //printf("\n=== Informe de Usuarios ===\n\n");
+    // Usuario que no haya realizado ningún préstamo
+    //printf("Usuarios sin prestamos:\n");
     char sqlUsuariosSinPrestamos[] = "SELECT * FROM Usuario WHERE ID_Usuario NOT IN (SELECT DISTINCT ID_Usuario FROM Prestamo)";
     sqlite3_stmt* stmtUsuariosSinPrestamos;
     int resultUsuariosSinPrestamos = sqlite3_prepare_v2(db, sqlUsuariosSinPrestamos, -1, &stmtUsuariosSinPrestamos, NULL);
@@ -704,24 +722,44 @@ void generarInformeUsuarios(sqlite3* db) {
         while (sqlite3_step(stmtUsuariosSinPrestamos) == SQLITE_ROW) {
             char* userID = (char*)sqlite3_column_text(stmtUsuariosSinPrestamos, 0);
             char* userName = (char*)sqlite3_column_text(stmtUsuariosSinPrestamos, 1);
-            printf("ID: %s, Nombre: %s\n", userID, userName);
+            char usuarioInfo[100];
+            sprintf(usuarioInfo, "ID: %s \n, Nombre: %s\n", userID, userName);
+            strcat(informe, usuarioInfo);
         }
     }
     sqlite3_finalize(stmtUsuariosSinPrestamos);
 
     // Usuario con más préstamos
-    printf("\nUsuario con mas prestamos:\n");
+    strcat(informe, "Usuario con mas prestamos:\n");
+    //printf("\nUsuario con mas prestamos:\n");
     char* userIDConMasPrestamos = obtenerUsuarioConMasPrestamos(db);
     if (userIDConMasPrestamos != NULL) {
         int numPrestamos = contarPrestamosPorUsuario(db, userIDConMasPrestamos);
-        printf("ID: %s, Numero de prestamos: %d\n", (char*)userIDConMasPrestamos, numPrestamos);
+        char usuarioMasPrestamosInfo[50];
+        sprintf(usuarioMasPrestamosInfo, "\tID: %s\n, \tNumero de prestamos: %d\n", (char*)userIDConMasPrestamos, numPrestamos);
+        strcat(informe, usuarioMasPrestamosInfo);
     } else {
-        printf("No hay usuarios registrados.\n");
+        strcat(informe, "No hay usuarios registrados.\n");
+        //printf("No hay usuarios registrados.\n");
     }
 
     // Número de usuarios registrados
-    printf("\nNumero total de usuarios registrados: %d\n", contarUsuariosRegistrados(db));
+    char usuariosRegistradosInfo[50];
+    sprintf(usuariosRegistradosInfo, "Numero total de usuarios registrados: %d\n", contarUsuariosRegistrados(db));
+    strcat(informe, usuariosRegistradosInfo);
+    //printf("\nNumero total de usuarios registrados: %d\n", contarUsuariosRegistrados(db));
 
+    // Concatenar las opciones del menú al informe
+    strcat(informe, "\n1. Volver al Menu de Informes\n");
+    strcat(informe, "2. Volver al Menu Principal\n");
+    strcat(informe, "Seleccione una opcion: \n");
+
+    // Liberar memoria utilizada por variables temporales
+    free(userIDConMasPrestamos);
+
+    // Devolver la cadena de caracteres con el informe generado
+    return informe;
+/*
     int opcion;
     do {
         printf("1. Volver al Menu de Informes\n");
@@ -740,7 +778,9 @@ void generarInformeUsuarios(sqlite3* db) {
                 printf("\nOpcion no valida. Por favor, seleccione una opcion valida.\n\n");
                 break;
         }
+
     } while (opcion != 1 && opcion != 2);
+*/
 }
 
 
@@ -799,29 +839,63 @@ int obtenerLibroMenosPrestado(sqlite3* db) {
 }
 
 // Función para generar el informe de préstamos
-void generarInformePrestamos(sqlite3* db) {
-    printf("\n=== Informe de Prestamos ===\n");
+char* generarInformePrestamos(sqlite3* db) {
+    // Crear un buffer para almacenar el informe
+    char* informe = (char*)malloc(TAMANIO_MAXIMO_INFORME * sizeof(char));
+    if (informe == NULL) {
+        // Manejar el error de asignación de memoria
+        printf("Error: No se pudo asignar memoria para el informe.\n");
+        return NULL;
+    }
+    
+    // Inicializar el buffer del informe
+    informe[0] = '\0';
+
+    // Concatenar cada parte del informe al buffer
+    strcat(informe, "\n=== Informe de Prestamos ===\n");
+    
+    //printf("\n=== Informe de Prestamos ===\n");
 
     // Número total de préstamos activos
     int numPrestamosActivos = obtenerNumeroPrestamosActivos(db);
-    printf("Numero total de prestamos activos: %d\n", numPrestamosActivos);
+    char prestamosActivosInfo[50];
+    sprintf(prestamosActivosInfo, "Numero total de prestamos activos: %d\n", numPrestamosActivos);
+    strcat(informe, prestamosActivosInfo);
+    //printf("Numero total de prestamos activos: %d\n", numPrestamosActivos);
 
     // Libro más prestado
     int libroMasPrestadoID = obtenerLibroMasPrestado(db);
     if (libroMasPrestadoID != -1) {
-        printf("isbn del libro más prestado: %d\n", libroMasPrestadoID);
+        char libroMasPrestadoInfo[50];
+        sprintf(libroMasPrestadoInfo, "ISBN del libro más prestado: %d\n", libroMasPrestadoID);
+        strcat(informe, libroMasPrestadoInfo);
+        //printf("isbn del libro más prestado: %d\n", libroMasPrestadoID);
     } else {
-        printf("No hay libros prestados.\n");
+        strcat(informe, "No hay libros prestados.\n");
+        //printf("No hay libros prestados.\n");
     }
 
     // Libro menos prestado
     int libroMenosPrestadoID = obtenerLibroMenosPrestado(db);
     if (libroMenosPrestadoID != -1) {
-        printf("ISBN del libro menos prestado: %d\n", libroMenosPrestadoID);
+        char libroMenosPrestadoInfo[50];
+        sprintf(libroMenosPrestadoInfo, "ISBN del libro menos prestado: %d\n", libroMenosPrestadoID);
+        strcat(informe, libroMenosPrestadoInfo);
+        //printf("ISBN del libro menos prestado: %d\n", libroMenosPrestadoID);
     } else {
-        printf("No hay libros prestados.\n");
+        strcat(informe, "No hay libros prestados.\n");
+        //printf("No hay libros prestados.\n");
     }
 
+    // Concatenar las opciones del menú al informe
+    strcat(informe, "\n1. Volver al Menu de Informes\n");
+    strcat(informe, "2. Volver al Menu Principal\n");
+    strcat(informe, "Seleccione una opcion: \n");
+
+    // Devolver la cadena de caracteres con el informe generado
+    return informe;
+
+    /*
     int opcion;
     do {
         printf("1. Volver al Menu de Informes\n");
@@ -841,6 +915,7 @@ void generarInformePrestamos(sqlite3* db) {
                 break;
         }
     } while (opcion != 1 && opcion != 2);
+    */
 }
 
 
@@ -899,24 +974,58 @@ int obtenerNumLibrosDevueltos(sqlite3* db) {
 
 // Función para generar el informe de libros
 void generarInformeLibros(sqlite3* db) {
-    printf("\n=== Informe de Libros ===\n");
+    // Crear un buffer para almacenar el informe
+    char* informe = (char*)malloc(TAMANIO_MAXIMO_INFORME * sizeof(char));
+    if (informe == NULL) {
+        // Manejar el error de asignación de memoria
+        printf("Error: No se pudo asignar memoria para el informe.\n");
+        return NULL;
+    }
+    
+    // Inicializar el buffer del informe
+    informe[0] = '\0';
+
+    // Concatenar cada parte del informe al buffer
+    strcat(informe, "\n=== Informe de Libros ===\n");
+
+    //printf("\n=== Informe de Libros ===\n");
 
     // Número de libros que no se han prestado
     int numLibrosNoPrestados = obtenerNumLibrosNoPrestados(db);
-    printf("Numero de libros que no se han prestado: %d\n", numLibrosNoPrestados);
+    char librosNoPrestadosInfo[50];
+    sprintf(librosNoPrestadosInfo, "Numero de libros que no se han prestado: %d\n", numLibrosNoPrestados);
+    strcat(informe, librosNoPrestadosInfo);
+    //printf("Numero de libros que no se han prestado: %d\n", numLibrosNoPrestados);
 
     // Número de libros prestados
     int numLibrosPrestados = obtenerNumLibrosPrestados(db);
-    printf("Numero de libros prestados: %d\n", numLibrosPrestados);
+    char librosPrestadosInfo[50];
+    sprintf(librosPrestadosInfo, "Numero de libros prestados: %d\n", numLibrosPrestados);
+    strcat(informe, librosPrestadosInfo);
+    //printf("Numero de libros prestados: %d\n", numLibrosPrestados);
 
     // Número de libros devueltos
     int numLibrosDevueltos = obtenerNumLibrosDevueltos(db);
-    printf("Numero de libros devueltos: %d\n", numLibrosDevueltos);
+    char librosDevueltosInfo[50];
+    sprintf(librosDevueltosInfo, "Numero de libros devueltos: %d\n", numLibrosDevueltos);
+    strcat(informe, librosDevueltosInfo);
+    //printf("Numero de libros devueltos: %d\n", numLibrosDevueltos);
 
     // Número total de libros
     int numTotalLibros = numLibrosNoPrestados + numLibrosPrestados + numLibrosDevueltos;
-    printf("Numero total de libros: %d\n", numTotalLibros);
+    char totalLibrosInfo[50];
+    sprintf(totalLibrosInfo, "Numero total de libros: %d\n", numTotalLibros);
+    strcat(informe, totalLibrosInfo);
+    //printf("Numero total de libros: %d\n", numTotalLibros);
 
+    // Concatenar las opciones del menú al informe
+    strcat(informe, "\n1. Volver al Menu de Informes\n");
+    strcat(informe, "2. Volver al Menu Principal\n");
+    strcat(informe, "Seleccione una opcion: \n");
+
+    // Devolver la cadena de caracteres con el informe generado
+    return informe;
+/*
     int opcion;
     do {
         printf("1. Volver al Menu de Informes\n");
@@ -936,7 +1045,10 @@ void generarInformeLibros(sqlite3* db) {
                 break;
         }
     } while (opcion != 1 && opcion != 2);
+*/
 }
+
+
 
 
 // MENU PRINCIPAL
