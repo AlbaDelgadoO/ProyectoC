@@ -132,6 +132,58 @@ int main(int argc, char *argv[]) {
 				const char* confirmacion = "Libro insertado correctamente";
 				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
+
+			// GESTIÓN DE USUARIOS
+			if(strcmp(recvBuff, "AgregarUsuario") == 0) {
+				// Código para agregar un nuevo usuario
+				char ID_Usuario[50], nombreU[50], apellidoU[50], correo[100], contrasenya[50];
+
+				// Recibir los detalles del nuevo usuario
+				recv(comm_socket, ID_Usuario, sizeof(ID_Usuario), 0);
+				recv(comm_socket, nombreU, sizeof(nombreU), 0);
+				recv(comm_socket, apellidoU, sizeof(apellidoU), 0);
+				recv(comm_socket, correo, sizeof(correo), 0);
+				recv(comm_socket, contrasenya, sizeof(contrasenya), 0);
+
+				// Crear un nuevo usuario
+				Usuario nuevoUsuario;
+				strcpy(nuevoUsuario.ID_Usuario, ID_Usuario);
+				strcpy(nuevoUsuario.nombreU, nombreU);
+				strcpy(nuevoUsuario.apellidoU, apellidoU);
+				strcpy(nuevoUsuario.correo, correo);
+				strcpy(nuevoUsuario.contrasenya, contrasenya);
+
+				// Insertar usuario en la BD
+				insertarUsuario(db, nuevoUsuario);
+
+				// Enviar confirmación al cliente de que el préstamo ha sido insertado
+				const char* confirmacion = "Usuario insertado correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			}
+			if(strcmp(recvBuff, "MostrarUsuarios") == 0) {
+				//Mostrar usuarios de la base de datos
+				leerUsuarios(db);
+
+				// Enviar confirmación al cliente de que el préstamo ha sido insertado
+				//const char* confirmacion = "Resultados mostrados correctamente";
+				//send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			}
+			if(strcmp(recvBuff, "BuscarUsuario") == 0) {
+				// Código para agregar un nuevo usuario
+				char termino[50];
+
+				// Recibir los detalles del usuario
+				recv(comm_socket, termino, sizeof(termino), 0);
+
+				// Buscar usuario en la BD
+				buscarUsuariosDB(db, termino);
+
+				// Enviar confirmación al cliente de que el préstamo ha sido insertado
+				//const char* confirmacion = "Resultados mostrados correctamente";
+				//send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			}
+
+
 			// GESTIÓN DE PRESTAMOS
 			if (strcmp(recvBuff, "AgregarPrestamo") == 0) {
 				// Código para agregar un nuevo préstamo

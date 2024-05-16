@@ -150,11 +150,93 @@ int main(int argc, char *argv[]) {
                 }while(opcionLibros != '4');
                 break;
         case '2':
+            char opcionUsuarios;
+            do {
             std::cout << "Gestion de Usuarios \n";
-            strcpy(sendBuff, "PedirUsuarios");
-            send(s, sendBuff, sizeof(sendBuff), 0);
-            recv(s, recvBuff, sizeof(recvBuff), 0);
-            std::cout << "Usuarios: " << recvBuff << "\n";
+            std::cout << "\n===Menu de Gestion de Usuarios ===\n1. Agregar Nuevo Usuario\n2. Mostrar todos los Usuarios\n3. Buscar Usuario\n4. Editar Usuario\n5. Borrar Usuario\n6. Volver al Menu Principal";
+            std::cout << "Seleccione una opcion: ";
+            std::cin >> opcionUsuarios;
+
+            std::string ID_Usuario, nombreU, apellidoU, correo, contrasenya;
+            if (opcionUsuarios == '1')
+            {
+                // codigo para agregar nuevo usuario
+                std::cout << "Ingrese los detalles del usuario: " << endl;
+                std:cout << "ID: ";
+                std::getline(std::cin >> std::ws, ID_Usuario);
+                clearIfNeeded(ID_Usuario, MAX_LINE);
+                std:cout << "Nombre: ";
+                std::getline(std::cin >> std::ws, nombreU);
+                clearIfNeeded(nombreU, MAX_LINE);
+                std:cout << "Apellido: ";
+                std::getline(std::cin >> std::ws, apellidoU);
+                clearIfNeeded(apellidoU, MAX_LINE);
+                std:cout << "Correo electronico: ";
+                std::getline(std::cin >> std::ws, correo);
+                clearIfNeeded(correo, MAX_LINE);
+                std:cout << "Contraseña: ";
+                std::getline(std::cin >> std::ws, contrasenya);
+                clearIfNeeded(contrasenya, MAX_LINE);
+
+                // enviar mensaje de "AgregarUsuario" al servidor
+                strcpy(sendBuff, "AgregarUsuario");
+                send(s, sendBuff, sizeof(sendBuff), 0);
+
+                // enviar detalles del usuario al servidor
+                send(s, ID_Usuario.c_str(), strlen(ID_Usuario.c_str()),0);
+                send(s, nombreU.c_str(), strlen(ID_Usuario.c_str()),0);
+                send(s, apellidoU.c_str(), strlen(ID_Usuario.c_str()),0);
+                send(s, correo.c_str(), strlen(ID_Usuario.c_str()),0);
+                send(s, contrasenya.c_str(), strlen(ID_Usuario.c_str()),0);
+
+                // esperar la respuesta del servidor
+                recv(s, recvBuff, sizeof(recvBuff), 0);
+                std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+            }
+            else if(opcionUsuarios == '2')
+            {
+                // codigo para mostrar todos los usuarios
+                // enviar mensaje de "MostrarUsuarios" al servidor
+                strcpy(sendBuff, "MostrarUsuarios");
+                send(s, sendBuff, sizeof(sendBuff), 0);
+
+                // esperar la respuesta del servidor
+                recv(s, recvBuff, sizeof(recvBuff), 0);
+                std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+            }
+            else if(opcionUsuarios == '3')
+            {
+                std::string termino;
+                // codigo para buscar usuario
+                std:cout << "Ingrese el ID o nombre del usuario: ";
+                std::getline(std::cin >> std::ws, termino);
+                clearIfNeeded(termino, MAX_LINE);
+
+                // enviar mensaje de "BuscarUsuario" al servidor
+                strcpy(sendBuff, "BuscarUsuario");
+                send(s, sendBuff, sizeof(sendBuff), 0);
+
+                // enviar detalles del usuario al servidor
+                send(s, termino.c_str(), strlen(termino.c_str()),0);
+
+                // esperar la respuesta del servidor
+                recv(s, recvBuff, sizeof(recvBuff), 0);
+                std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+            }
+            else if(opcionUsuarios == '4')
+            {
+                // codigo para editar usuario
+            }
+            else if(opcionUsuarios == '5')
+            {
+                // codigo para borrar usuario
+            }
+            else if(opcionUsuarios == '6')
+            {
+                // codigo para volver al menu principal
+            }
+            
+            } while(opcionUsuarios != '6')
             break;
         case '3':
             std::cout << "Gestion de Prestamos \n";
