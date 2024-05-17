@@ -208,7 +208,7 @@ int main(int argc, char *argv[]) {
             {
                 std::string termino;
                 // codigo para buscar usuario
-                std:cout << "Ingrese el ID o nombre del usuario: ";
+                std::cout << "Ingrese el ID o nombre del usuario: ";
                 std::getline(std::cin >> std::ws, termino);
                 clearIfNeeded(termino, MAX_LINE);
 
