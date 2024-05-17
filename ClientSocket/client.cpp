@@ -80,7 +80,6 @@ int main(int argc, char *argv[]) {
         case '1':
                 char opcionLibros;
                 do{            
-                    std::cout << "Gestion de Libros \n";
                     std::cout << "\n=== Menu de Gestion de Libros ===\n1. Agregar Nuevo Libro\n2. Mostrar Todos los Libros\n3. Buscar Libro\n4. Volver al Menu Principal\n";
                     std::cout << "Seleccione una opcion: ";
                     std::cin >> opcionLibros; // Captura la opción seleccionada por el usuario
@@ -89,59 +88,93 @@ int main(int argc, char *argv[]) {
                     int nEjemplares, aPubl, cod_E;
                     if(opcionLibros == '1') 
                     {
-                        //Codigo para agregar un libro
-                        std::cout << "Ingrese los detalles del libro:\n";
-                        std::cout << "ISBN: ";
-                        std::getline(std::cin >> std::ws, isbn);
-                        clearIfNeeded(isbn, MAX_LINE);
-                        std::cout << "Titulo: ";
-                        std::getline(std::cin >> std::ws, titulo);
-                        clearIfNeeded(titulo, MAX_LINE);
-                        std::cout << "Genero: ";
-                        std::getline(std::cin >> std::ws, genero);
-                        clearIfNeeded(genero, MAX_LINE);
-                        std::cout << "Nombre del autor: ";
-                        std::getline(std::cin >> std::ws, autor);
-                        clearIfNeeded(autor, MAX_LINE);
-                        std::cout << "Apellido del autor: ";
-                        std::getline(std::cin >> std::ws, apellido);
-                        clearIfNeeded(apellido, MAX_LINE);
-                        std::cout << "Numero de ejemplares: ";
+                        std::cin.ignore(); 
+                        std::cout << "ISBN (13 numeros): ";
+                        std::getline(std::cin, isbn);
+                        if (isbn.length() != 13) {
+                            std::cerr << "El ISBN debe tener 13 numeros.\n";
+                            continue;
+                        }
+                        std::cout << "Titulo (max 100 caracteres): ";
+                        std::getline(std::cin, titulo);
+                        if (titulo.length() > 100) {
+                            std::cerr << "El titulo no debe exceder 100 caracteres.\n";
+                            continue;
+                        }
+                        std::cout << "Genero (max 100 caracteres): ";
+                        std::getline(std::cin, genero);
+                        if (genero.length() > 100) {
+                            std::cerr << "El genero no debe exceder 100 caracteres.\n";
+                            continue;
+                        }
+                        std::cout << "Nombre del Autor: ";
+                        std::getline(std::cin, autor);
+                        if (autor.length() > 100) {
+                            std::cerr << "El nombre del autor no debe exceder 100 caracteres.\n";
+                            continue;
+                        }
+                        std::cout << "Apellido del Autor: ";
+                        std::getline(std::cin, apellido);
+                        if (apellido.length() > 100) {
+                            std::cerr << "El apellido del autor no debe exceder 100 caracteres.\n";
+                            continue;
+                        }
+                        std::cout << "Numero de Ejemplares: ";
                         std::cin >> nEjemplares;
-                        std::cout << "Anyo de publicacion: ";
+                        std::cout << "Anyo de Publicacion: ";
                         std::cin >> aPubl;
-                        std::cout << "Codigo de editorial: ";
+                        std::cout << "Codigo Editorial: ";
                         std::cin >> cod_E;
 
-                        // Enviar el mensaje "AgregarLibro" al servidor
-                        strcpy(sendBuff, "AgregarLibro");
-                        send(s, sendBuff, sizeof(sendBuff), 0);
+                        std::string bookDetails = "AgregarLibro|" + isbn + "|" + titulo + "|" + genero + "|" + autor + "|" + apellido + "|" + std::to_string(nEjemplares) + "|" + std::to_string(aPubl) + "|" + std::to_string(cod_E);
 
-                        // Enviar los detalles del libro al servidor
-                        send(s, isbn.c_str(), strlen(isbn.c_str()), 0);
-                        send(s, titulo.c_str(), strlen(titulo.c_str()), 0);
-                        send(s, genero.c_str(), strlen(genero.c_str()), 0);
-                        send(s, autor.c_str(), strlen(autor.c_str()), 0);
-                        send(s, apellido.c_str(), strlen(apellido.c_str()), 0);
-                        send(s, std::to_string(nEjemplares).c_str(), std::to_string(nEjemplares).length(), 0);
-                        send(s, std::to_string(aPubl).c_str(), std::to_string(aPubl).length(), 0);
-                        send(s, std::to_string(cod_E).c_str(), std::to_string(cod_E).length(), 0);
+                        send(s, bookDetails.c_str(), bookDetails.length() + 1, 0);  
+                        std::cout << "\nDetalles del libro enviados al servidor.\n";
 
-                        // Esperar la respuesta del servidor
-                        recv(s, recvBuff, sizeof(recvBuff), 0);
-                        std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+                        int bytesReceived = recv(s, recvBuff, sizeof(recvBuff) - 1, 0);
+                        if (bytesReceived > 0) {
+                            recvBuff[bytesReceived] = '\0';
+                            std::cout << "\nRespuesta del servidor: " << recvBuff << "\n";
+                        }                   
                     }
-                    else if(opcionLibros == '2')
+                    if(opcionLibros == '2')
                     {
                         //Codigo para leer libros
+                        strcpy(sendBuff, "LeerLibros");
+                        send(s, sendBuff, sizeof(sendBuff), 0); 
+
+                        // Recibir y mostrar los datos de los libros del servidor
+                        int bytesReceived = recv(s, recvBuff, sizeof(recvBuff) - 1, 0);
+                        if (bytesReceived > 0) {
+                            recvBuff[bytesReceived] = '\0';
+                            std::cout << "\nDatos de libros recibidos del servidor:\n" << recvBuff << std::endl;
+                        } else {
+                            std::cerr << "\nError al recibir datos de libros del servidor.\n";
+                        }
                     } 
                     else if(opcionLibros == '3')
                     {
                         //Codigo para buscar un libro
+                        std::string terminoBusqueda;
+                        std::cout << "Ingrese el termino de busqueda (titulo, genero o autor): ";
+                        std::getline(std::cin, terminoBusqueda);
+
+                        // Enviar el término de búsqueda al servidor
+                        send(s, terminoBusqueda.c_str(), terminoBusqueda.length() + 1, 0);
+
+                        // Recibir y mostrar los resultados de la búsqueda del servidor
+                        int bytesReceived = recv(s, recvBuff, sizeof(recvBuff), 0);
+                        if (bytesReceived > 0) {
+                            recvBuff[bytesReceived] = '\0';
+                            std::cout << "\nResultados de la busqueda:\n" << recvBuff << std::endl;
+                        } else {
+                            std::cerr << "\nError al recibir resultados de busqueda del servidor.\n";
+                        }
                     } 
                     else if(opcionLibros == '4')
                     {
                         //Codigo para volver al menu principal
+                        break;
                     } 
                     else
                     {

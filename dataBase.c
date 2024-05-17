@@ -102,7 +102,36 @@ void leerLibros(sqlite3* db) {
 
     sqlite3_finalize(stmt);
 }
+char* obtenerDatosLibros(sqlite3* db) {
+    char* librosData = malloc(4096 * sizeof(char)); // Reservar memoria para almacenar los datos de los libros
+    librosData[0] = '\0'; // Inicializar la cadena vacía
+    sqlite3_stmt* stmt;
+    const char* sql = "SELECT * FROM Libro";
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        strcpy(librosData, "Error al obtener los datos de los libros.");
+        return librosData;
+    }
 
+    // Construir la cadena con los datos de los libros
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        const unsigned char* isbn = sqlite3_column_text(stmt, 0);
+        const unsigned char* titulo = sqlite3_column_text(stmt, 1);
+        const unsigned char* genero = sqlite3_column_text(stmt, 2);
+        const unsigned char* n_autor = sqlite3_column_text(stmt, 3);
+        const unsigned char* a_autor = sqlite3_column_text(stmt, 4);
+        int anyo = sqlite3_column_int(stmt, 5);
+        int nEjemplares = sqlite3_column_int(stmt, 6);
+        int cod_e = sqlite3_column_int(stmt, 7);
+
+        // Concatenar los datos del libro a la cadena
+        sprintf(librosData + strlen(librosData), "%s | %s | %s | %s | %s | %d | %d | %d\n",
+                isbn, titulo, genero, n_autor, a_autor, anyo, nEjemplares, cod_e);
+    }
+
+    sqlite3_finalize(stmt); // Liberar el statement
+    return librosData;
+}
 void buscarLibroBD(sqlite3* db, const char* termino) {
     char* sql = "SELECT * FROM Libro WHERE Titulo LIKE '%' || ? || '%' OR Nom_Autor LIKE ? OR Genero LIKE ?";
     sqlite3_stmt* stmt;
@@ -141,6 +170,41 @@ void buscarLibroBD(sqlite3* db, const char* termino) {
     }
 
     sqlite3_finalize(stmt);
+}
+char* obtenerLibro(sqlite3* db, const char* termino) {
+    char* librosData = malloc(4096 * sizeof(char)); // Reservar memoria para almacenar los datos de los libros
+    librosData[0] = '\0'; // Inicializar la cadena vacía
+    sqlite3_stmt* stmt;
+    const char* sql = "SELECT * FROM Libro WHERE Titulo LIKE '%' || ? || '%' OR Nom_Autor LIKE '%' || ? || '%' OR Genero LIKE '%' || ? || '%' OR Apellido_A LIKE '%' || ? || '%'";
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        strcpy(librosData, "Error al buscar el libro en la base de datos.");
+        return librosData;
+    }
+
+    // Bindear los parámetros a la consulta
+    sqlite3_bind_text(stmt, 1, termino, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, termino, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, termino, -1, SQLITE_STATIC);
+
+    // Construir la cadena con los detalles de los libros
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        const unsigned char* isbn = sqlite3_column_text(stmt, 0);
+        const unsigned char* titulo = sqlite3_column_text(stmt, 1);
+        const unsigned char* genero = sqlite3_column_text(stmt, 2);
+        const unsigned char* n_autor = sqlite3_column_text(stmt, 3);
+        const unsigned char* a_autor = sqlite3_column_text(stmt, 4);
+        int anyo = sqlite3_column_int(stmt, 5);
+        int nEjemplares = sqlite3_column_int(stmt, 6);
+        int cod_e = sqlite3_column_int(stmt, 7);
+
+        // Concatenar los detalles del libro a la cadena
+        sprintf(librosData + strlen(librosData), "%s|%s|%s|%s|%s|%d|%d|%d\n",
+                isbn, titulo, genero, n_autor, a_autor, anyo, nEjemplares, cod_e);
+    }
+
+    sqlite3_finalize(stmt); // Liberar el statement
+    return librosData;
 }
 
 void comprobarAutor(sqlite3* db, Libro libro) {

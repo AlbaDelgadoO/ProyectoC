@@ -93,44 +93,57 @@ int main(int argc, char *argv[]) {
 		int bytes = recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
 		if (bytes > 0) {
 			//GESTION DE LIBROS
-			if(strcmp(recvBuff, "AgregarLibro") == 0)
-			{
-				//Codigo para agregar un libro
-				// Recibir los detalles del libro del cliente
-				char isbn[15], titulo[100], genero[100], autor[100], apellido[100], nEjemplaresStr[20], aPublStr[20], cod_EStr[20];
+			if (strncmp(recvBuff, "AgregarLibro", 12) == 0) {
+				char *token;
+				token = strtok(recvBuff, "|");
+				token = strtok(NULL, "|"); // Skip "AgregarLibro"
+
+				char isbn[14], titulo[101], genero[101], autor[101], apellido[101];
 				int nEjemplares, aPubl, cod_E;
 
-				// Recibir los detalles del libro del cliente
-				recv(comm_socket, isbn, sizeof(isbn), 0);
-				recv(comm_socket, titulo, sizeof(titulo), 0);
-				recv(comm_socket, genero, sizeof(genero), 0);
-				recv(comm_socket, autor, sizeof(autor), 0);
-				recv(comm_socket, apellido, sizeof(apellido), 0);
-				recv(comm_socket, nEjemplaresStr, sizeof(nEjemplaresStr), 0);
-				recv(comm_socket, aPublStr, sizeof(aPublStr), 0);
-				recv(comm_socket, cod_EStr, sizeof(cod_EStr), 0);
-
-				// Convertir las cadenas a enteros
-				nEjemplares = atoi(nEjemplaresStr);
-				aPubl = atoi(aPublStr);
-				cod_E = atoi(cod_EStr);
+				strncpy(isbn, token, 13); isbn[13] = '\0'; token = strtok(NULL, "|");
+				strncpy(titulo, token, 100); titulo[100] = '\0'; token = strtok(NULL, "|");
+				strncpy(genero, token, 100); genero[100] = '\0'; token = strtok(NULL, "|");
+				strncpy(autor, token, 100); autor[100] = '\0'; token = strtok(NULL, "|");
+				strncpy(apellido, token, 100); apellido[100] = '\0'; token = strtok(NULL, "|");
+				nEjemplares = atoi(token); token = strtok(NULL, "|");
+				aPubl = atoi(token); token = strtok(NULL, "|");
+				cod_E = atoi(token);
 
 				// Crear una instancia de Libro con los detalles ingresados por el usuario
 				Libro nuevoLibro;
-				strcpy(nuevoLibro.ISBN, isbn);
-				strcpy(nuevoLibro.titulo, titulo);
-				strcpy(nuevoLibro.genero, genero);
-				strcpy(nuevoLibro.nom_autor, autor);
-				strcpy(nuevoLibro.apellido_autor, apellido);
+				strncpy(nuevoLibro.ISBN, isbn, 14);
+				strncpy(nuevoLibro.titulo, titulo, 101);
+				strncpy(nuevoLibro.genero, genero, 101);
+				strncpy(nuevoLibro.nom_autor, autor, 101);
+				strncpy(nuevoLibro.apellido_autor, apellido, 101);
 				nuevoLibro.numEjemplares = nEjemplares;
 				nuevoLibro.anyoPublicacion = aPubl;
 				nuevoLibro.cod_Editorial = cod_E;
 
 				// Insertar el nuevo libro en la base de datos
 				insertarLibro(db, nuevoLibro);
+
 				// Enviar confirmación al cliente de que el libro ha sido insertado
 				const char* confirmacion = "Libro insertado correctamente";
-				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+				send(comm_socket, confirmacion, strlen(confirmacion) + 1, 0);  // Add +1 to include the null terminator
+			}
+			if (strcmp(recvBuff, "LeerLibros") == 0) 
+			{
+				char* librosData = obtenerDatosLibros(db); 
+				send(comm_socket, librosData, strlen(librosData) + 1, 0); 
+				free(librosData); // Liberar la memoria utilizada
+			}
+			if (strcmp(recvBuff, "BuscarLibro") == 0) 
+			{
+				// Recibir el término de búsqueda del cliente
+				char terminoBusqueda[100];
+				recv(comm_socket, terminoBusqueda, sizeof(terminoBusqueda), 0);
+
+				// Buscar el libro en la base de datos y enviar los detalles al cliente
+				char* librosData = obtenerLibro(db, terminoBusqueda);
+				send(comm_socket, librosData, strlen(librosData) + 1, 0); // Enviar los detalles de los libros al cliente
+				free(librosData); // Liberar la memoria utilizada
 			}
 
 			// GESTIÓN DE USUARIOS
