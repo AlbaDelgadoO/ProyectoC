@@ -150,11 +150,93 @@ int main(int argc, char *argv[]) {
                 }while(opcionLibros != '4');
                 break;
         case '2':
+            char opcionUsuarios;
+            do {
             std::cout << "Gestion de Usuarios \n";
-            strcpy(sendBuff, "PedirUsuarios");
-            send(s, sendBuff, sizeof(sendBuff), 0);
-            recv(s, recvBuff, sizeof(recvBuff), 0);
-            std::cout << "Usuarios: " << recvBuff << "\n";
+            std::cout << "\n===Menu de Gestion de Usuarios ===\n1. Agregar Nuevo Usuario\n2. Mostrar todos los Usuarios\n3. Buscar Usuario\n4. Editar Usuario\n5. Borrar Usuario\n6. Volver al Menu Principal";
+            std::cout << "Seleccione una opcion: ";
+            std::cin >> opcionUsuarios;
+
+            std::string ID_Usuario, nombreU, apellidoU, correo, contrasenya;
+            if (opcionUsuarios == '1')
+            {
+                // codigo para agregar nuevo usuario
+                std::cout << "Ingrese los detalles del usuario:\n";
+                std::cout << "ID: ";
+                std::getline(std::cin >> std::ws, ID_Usuario);
+                clearIfNeeded(ID_Usuario, MAX_LINE);
+                std::cout << "Nombre: ";
+                std::getline(std::cin >> std::ws, nombreU);
+                clearIfNeeded(nombreU, MAX_LINE);
+                std::cout << "Apellido: ";
+                std::getline(std::cin >> std::ws, apellidoU);
+                clearIfNeeded(apellidoU, MAX_LINE);
+                std::cout << "Correo electronico: ";
+                std::getline(std::cin >> std::ws, correo);
+                clearIfNeeded(correo, MAX_LINE);
+                std::cout << "Contraseña: ";
+                std::getline(std::cin >> std::ws, contrasenya);
+                clearIfNeeded(contrasenya, MAX_LINE);
+
+                // enviar mensaje de "AgregarUsuario" al servidor
+                strcpy(sendBuff, "AgregarUsuario");
+                send(s, sendBuff, sizeof(sendBuff), 0);
+
+                // enviar detalles del usuario al servidor
+                send(s, ID_Usuario.c_str(), strlen(ID_Usuario.c_str()),0);
+                send(s, nombreU.c_str(), strlen(ID_Usuario.c_str()),0);
+                send(s, apellidoU.c_str(), strlen(ID_Usuario.c_str()),0);
+                send(s, correo.c_str(), strlen(ID_Usuario.c_str()),0);
+                send(s, contrasenya.c_str(), strlen(ID_Usuario.c_str()),0);
+
+                // esperar la respuesta del servidor
+                recv(s, recvBuff, sizeof(recvBuff), 0);
+                std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+            }
+            else if(opcionUsuarios == '2')
+            {
+                // codigo para mostrar todos los usuarios
+                // enviar mensaje de "MostrarUsuarios" al servidor
+                strcpy(sendBuff, "MostrarUsuarios");
+                send(s, sendBuff, sizeof(sendBuff), 0);
+
+                // esperar la respuesta del servidor
+                recv(s, recvBuff, sizeof(recvBuff), 0);
+                std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+            }
+            else if(opcionUsuarios == '3')
+            {
+                std::string termino;
+                // codigo para buscar usuario
+                std::cout << "Ingrese el ID o nombre del usuario: ";
+                std::getline(std::cin >> std::ws, termino);
+                clearIfNeeded(termino, MAX_LINE);
+
+                // enviar mensaje de "BuscarUsuario" al servidor
+                strcpy(sendBuff, "BuscarUsuario");
+                send(s, sendBuff, sizeof(sendBuff), 0);
+
+                // enviar detalles del usuario al servidor
+                send(s, termino.c_str(), strlen(termino.c_str()),0);
+
+                // esperar la respuesta del servidor
+                recv(s, recvBuff, sizeof(recvBuff), 0);
+                std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+            }
+            else if(opcionUsuarios == '4')
+            {
+                // codigo para editar usuario
+            }
+            else if(opcionUsuarios == '5')
+            {
+                // codigo para borrar usuario
+            }
+            else if(opcionUsuarios == '6')
+            {
+                // codigo para volver al menu principal
+            }
+            
+            } while(opcionUsuarios != '6');
             break;
         case '3':
             std::cout << "Gestion de Prestamos \n";
@@ -249,51 +331,70 @@ int main(int argc, char *argv[]) {
 
         case '5':
             char opcionInformes;
-            do{            
+            char opcionMenuInforme;
+            char continuar;
+            do {            
                 std::cout << "Generacion de Informes \n";
                 std::cout << "\n=== Menu de Informes ===\n1. Informe de Usuarios\n2. Informe de Prestamos\n3. Informe de Libros\n4. Volver al Menu Principal\n";
                 std::cout << "Seleccione una opcion: ";
                 std::cin >> opcionInformes; // Captura la opción seleccionada por el usuario
 
-                std::string isbn, titulo, genero, autor, apellido;
-                int nEjemplares, aPubl, cod_E;
                 if(opcionInformes == '1') { 
-                    // Enviar el mensaje "informe de usuario" al servidor
+                    // Enviar el mensaje "informeUsuario" al servidor
                     strcpy(sendBuff, "informeUsuario");
                     send(s, sendBuff, sizeof(sendBuff), 0);
 
                     // Esperar la respuesta del servidor
                     recv(s, recvBuff, sizeof(recvBuff), 0);
-                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
-                        
-                }else if(opcionInformes == '2') {
-                    // Enviar el mensaje "informe de prestamos" al servidor
+                    // Imprimir el informe en la consola del cliente
+                    std::cout << "Informe de usuarios:\n" << recvBuff << "\n";    
+                    
+                } else if(opcionInformes == '2') {
+                    // Enviar el mensaje "informePrestamos" al servidor
                     strcpy(sendBuff, "informePrestamos");
                     send(s, sendBuff, sizeof(sendBuff), 0);
 
                     // Esperar la respuesta del servidor
                     recv(s, recvBuff, sizeof(recvBuff), 0);
-                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
-                    break;
-                }else if(opcionInformes == '3') {
-                    // Enviar el mensaje "informe de libros" al servidor
+                    std::cout << "Informe de prestamos:\n" << recvBuff << "\n";
+
+                } else if(opcionInformes == '3') {
+                    // Enviar el mensaje "informeLibros" al servidor
                     strcpy(sendBuff, "informeLibros");
                     send(s, sendBuff, sizeof(sendBuff), 0);
 
                     // Esperar la respuesta del servidor
                     recv(s, recvBuff, sizeof(recvBuff), 0);
-                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
-                    break;
-                }else if(opcionInformes == '4') {
-                    //Codigo para volver al menu principal
-                    break;
-                }else {
+                    std::cout << "Informe de libros:\n" << recvBuff << "\n";
+
+                } else if(opcionInformes == '4') {
+                    // Código para volver al menú principal
+                    std::cout << "Volviendo al Menu Principal...\n";
+
+                } else {
                     std::cout << "Opcion invalida\n";
-                    break;
-                }
-                break;
-            }while(opcionInformes != '4');
-        
+/*                    do {
+                        std::cout << "1. Volver al Menu de Informes\n";
+                        std::cout << "2. Volver al Menu Principal\n";
+                        std::cout << "Seleccione una opcion: ";
+                        std::cin >> opcionMenuInforme;
+
+                        switch (opcionMenuInforme) {
+                            case 1:
+                                std::cout << "\nVolviendo al Menu de Informes...\n\n";
+                                break;
+                            case 2:
+                                std::cout << "\nVolviendo al Menu Principal...\n\n";
+                                break;
+                            default:
+                                std::cout << "\nOpcion no valida. Por favor, seleccione una opcion valida.\n\n";
+                                break;
+                        }
+                    } while (opcionMenuInforme != 1 && opcionMenuInforme != 2);
+*/                } 
+            } while(opcionInformes != '4');
+            break;
+    
     }
     std::cout << "Cerrando socket... \n";
     strcpy(sendBuff, "Bye");
