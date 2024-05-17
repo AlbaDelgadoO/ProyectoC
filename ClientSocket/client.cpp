@@ -161,20 +161,20 @@ int main(int argc, char *argv[]) {
             if (opcionUsuarios == '1')
             {
                 // codigo para agregar nuevo usuario
-                std::cout << "Ingrese los detalles del usuario: " << endl;
-                std:cout << "ID: ";
+                std::cout << "Ingrese los detalles del usuario:\n";
+                std::cout << "ID: ";
                 std::getline(std::cin >> std::ws, ID_Usuario);
                 clearIfNeeded(ID_Usuario, MAX_LINE);
-                std:cout << "Nombre: ";
+                std::cout << "Nombre: ";
                 std::getline(std::cin >> std::ws, nombreU);
                 clearIfNeeded(nombreU, MAX_LINE);
-                std:cout << "Apellido: ";
+                std::cout << "Apellido: ";
                 std::getline(std::cin >> std::ws, apellidoU);
                 clearIfNeeded(apellidoU, MAX_LINE);
-                std:cout << "Correo electronico: ";
+                std::cout << "Correo electronico: ";
                 std::getline(std::cin >> std::ws, correo);
                 clearIfNeeded(correo, MAX_LINE);
-                std:cout << "Contraseña: ";
+                std::cout << "Contraseña: ";
                 std::getline(std::cin >> std::ws, contrasenya);
                 clearIfNeeded(contrasenya, MAX_LINE);
 
@@ -236,7 +236,7 @@ int main(int argc, char *argv[]) {
                 // codigo para volver al menu principal
             }
             
-            } while(opcionUsuarios != '6')
+            } while(opcionUsuarios != '6');
             break;
         case '3':
             std::cout << "Gestion de Prestamos \n";
