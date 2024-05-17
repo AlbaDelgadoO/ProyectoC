@@ -335,7 +335,7 @@ void registrarDevolucion(sqlite3* db) {
     if (devolucionExitosa) {
         printf("El libro ha sido devuelto con exito.\n\n");
     } else {
-        printf("No hay préstamos pendientes para este libro.\n\n");
+        printf("No hay prestamos pendientes para este libro.\n\n");
     }
 }
 

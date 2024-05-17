@@ -198,7 +198,7 @@ int main(int argc, char *argv[]) {
                     std::string idLibro;
 
                     // Solicitar al usuario el ID del libro asociado al préstamo que desea renovar
-                    std::cout << "Ingrese el ID del libro asociado al préstamo que desea renovar: ";
+                    std::cout << "Ingrese el ID del libro asociado al prestamo que desea renovar: ";
                     std::cin >> idLibro;
 
                     // Enviar el mensaje "RenovarPrestamo" al servidor
