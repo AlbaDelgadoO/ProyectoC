@@ -7,6 +7,8 @@
 #include <string.h>
 #include <time.h>
 
+#define TAMANIO_MAXIMO_INFORME 1000
+
 void agregarNuevoLibro(sqlite3* db) {
     // Solicitar detalles del nuevo libro al usuario
     printf("\n");
@@ -947,7 +949,7 @@ int obtenerNumLibrosDevueltos(sqlite3* db) {
 }
 
 // Función para generar el informe de libros
-void generarInformeLibros(sqlite3* db) {
+char* generarInformeLibros(sqlite3* db) {
     // Crear un buffer para almacenar el informe
     char* informe = (char*)malloc(TAMANIO_MAXIMO_INFORME * sizeof(char));
     if (informe == NULL) {
