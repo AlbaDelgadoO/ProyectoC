@@ -128,13 +128,13 @@ int main(int argc, char *argv[]) {
 				const char* confirmacion = "Libro insertado correctamente";
 				send(comm_socket, confirmacion, strlen(confirmacion) + 1, 0);  // Add +1 to include the null terminator
 			}
-			if (strcmp(recvBuff, "LeerLibros") == 0) 
+			else if (strcmp(recvBuff, "LeerLibros") == 0) 
 			{
 				char* librosData = obtenerDatosLibros(db); 
 				send(comm_socket, librosData, strlen(librosData) + 1, 0); 
 				free(librosData); // Liberar la memoria utilizada
 			}
-			if (strcmp(recvBuff, "BuscarLibro") == 0) 
+			else if (strcmp(recvBuff, "BuscarLibro") == 0) 
 			{
 				// Recibir el término de búsqueda del cliente
 				char terminoBusqueda[100];
@@ -147,41 +147,42 @@ int main(int argc, char *argv[]) {
 			}
 
 			// GESTIÓN DE USUARIOS
-			if(strcmp(recvBuff, "AgregarUsuario") == 0) {
+			else if(strncmp(recvBuff, "AgregarUsuario", 14) == 0) {
 				// Código para agregar un nuevo usuario
+				char* token;
+				token = strtok(recvBuff, "|");
+				token = strtok(NULL, "|");
 				char ID_Usuario[50], nombreU[50], apellidoU[50], correo[100], contrasenya[50];
 
-				// Recibir los detalles del nuevo usuario
-				recv(comm_socket, ID_Usuario, sizeof(ID_Usuario), 0);
-				recv(comm_socket, nombreU, sizeof(nombreU), 0);
-				recv(comm_socket, apellidoU, sizeof(apellidoU), 0);
-				recv(comm_socket, correo, sizeof(correo), 0);
-				recv(comm_socket, contrasenya, sizeof(contrasenya), 0);
+				strncpy(ID_Usuario, token,49); ID_Usuario[49] = '\0'; token = strtok(NULL, "|");
+				strncpy(nombreU, token,49); nombreU[49] = '\0'; token = strtok(NULL, "|");
+				strncpy(apellidoU, token,49); apellidoU[49] = '\0'; token = strtok(NULL, "|");
+				strncpy(correo, token,99); correo[99] = '\0'; token = strtok(NULL, "|");
+				strncpy(contrasenya, token,49); contrasenya[49] = '\0'; token = strtok(NULL, "|");
+
+
 
 				// Crear un nuevo usuario
 				Usuario nuevoUsuario;
-				strcpy(nuevoUsuario.ID_Usuario, ID_Usuario);
-				strcpy(nuevoUsuario.nombreU, nombreU);
-				strcpy(nuevoUsuario.apellidoU, apellidoU);
-				strcpy(nuevoUsuario.correo, correo);
-				strcpy(nuevoUsuario.contrasenya, contrasenya);
+				strncpy(nuevoUsuario.ID_Usuario, ID_Usuario,50);
+				strncpy(nuevoUsuario.nombreU, nombreU,50);
+				strncpy(nuevoUsuario.apellidoU, apellidoU, 50);
+				strncpy(nuevoUsuario.correo, correo,100);
+				strncpy(nuevoUsuario.contrasenya, contrasenya, 50);
 
 				// Insertar usuario en la BD
 				insertarUsuario(db, nuevoUsuario);
 
 				// Enviar confirmación al cliente de que el préstamo ha sido insertado
 				const char* confirmacion = "Usuario insertado correctamente";
-				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+				send(comm_socket, confirmacion, strlen(confirmacion) + 1, 0);
 			}
-			if(strcmp(recvBuff, "MostrarUsuarios") == 0) {
-				//Mostrar usuarios de la base de datos
-				leerUsuarios(db);
-
-				// Enviar confirmación al cliente de que el préstamo ha sido insertado
-				//const char* confirmacion = "Resultados mostrados correctamente";
-				//send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			else if(strcmp(recvBuff, "MostrarUsuarios") == 0) {
+				char* usuarios = obtenerUsuarios(db);
+				send(comm_socket, usuarios, strlen(usuarios)+1, 0);
+				free(usuarios);
 			}
-			if(strcmp(recvBuff, "BuscarUsuario") == 0) {
+			else if(strcmp(recvBuff, "BuscarUsuario") == 0) {
 				// Código para agregar un nuevo usuario
 				char termino[50];
 
@@ -198,7 +199,7 @@ int main(int argc, char *argv[]) {
 
 
 			// GESTIÓN DE PRESTAMOS
-			if (strcmp(recvBuff, "AgregarPrestamo") == 0) {
+			else if (strcmp(recvBuff, "AgregarPrestamo") == 0) {
 				// Código para agregar un nuevo préstamo
 				char idLibro[13], idUsuario[13], fechaVencimiento[20];
 
@@ -221,7 +222,7 @@ int main(int argc, char *argv[]) {
 				const char* confirmacion = "Prestamo insertado correctamente";
 				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
-			if (strcmp(recvBuff, "RenovarPrestamo") == 0) {
+			else if (strcmp(recvBuff, "RenovarPrestamo") == 0) {
 				// Código para renovar un préstamo existente
 				char idLibro[20];
 
@@ -235,7 +236,7 @@ int main(int argc, char *argv[]) {
 				const char* confirmacion = "Prestamo renovado correctamente";
 				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
-			if (strcmp(recvBuff, "DevolverLibro") == 0) {
+			else if (strcmp(recvBuff, "DevolverLibro") == 0) {
 				// Código para registrar la devolución de un libro
 				char idLibro[15];
 

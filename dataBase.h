@@ -16,6 +16,7 @@ char* obtenerLibro(sqlite3* db, const char* termino);
 void crearTablaUsuario(sqlite3* db);
 void insertarUsuario(sqlite3* db, Usuario usuario);
 void leerUsuarios(sqlite3* db);
+char* obtenerUsuarios(sqlite3* db);
 void buscarUsuariosDB(sqlite3* db, char* termino);
 
 void modificarContra(sqlite3* db, char* contraNueva, char* id);

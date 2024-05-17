@@ -303,6 +303,32 @@ void leerUsuarios(sqlite3* db) {
     sqlite3_finalize(stmt);
 }
 
+// funcion adaptada para cliente-servidor
+char* obtenerUsuarios(sqlite3* db) {
+    char* usuarios = malloc(4096* sizeof(char));
+    usuarios[0] = '\0';
+    sqlite3_stmt* stmt;
+    const char* sql = "SELECT * FROM Usuario";
+    if(sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        strcpy(usuarios, "Error al obtener los datos de los usuarios");
+        return usuarios;
+    }
+
+    while(sqlite3_step(stmt) == SQLITE_ROW) {
+        const unsigned char* id = sqlite3_column_text(stmt, 0);
+        const unsigned char* nombre = sqlite3_column_text(stmt, 1);
+        const unsigned char* apellido = sqlite3_column_text(stmt, 2);
+        const unsigned char* correo = sqlite3_column_text(stmt, 3);
+        const unsigned char* contr = sqlite3_column_text(stmt, 4);
+
+        sprintf(usuarios + strlen(usuarios), "%-10s %-10s %-20s %-25s %-15s\n",
+                id, nombre, apellido, correo, contr);
+    }
+    sqlite3_finalize(stmt);
+    return usuarios;
+}
+
 void buscarUsuariosDB(sqlite3* db, char* termino) {
     char* sql = "SELECT * FROM Usuario WHERE ID_Usuario LIKE ? OR Nombre LIKE ?";
     sqlite3_stmt* stmt;

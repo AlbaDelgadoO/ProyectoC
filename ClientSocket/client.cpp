@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <winsock2.h>
+#include <iomanip>
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
@@ -185,8 +186,7 @@ int main(int argc, char *argv[]) {
         case '2':
             char opcionUsuarios;
             do {
-            std::cout << "Gestion de Usuarios \n";
-            std::cout << "\n===Menu de Gestion de Usuarios ===\n1. Agregar Nuevo Usuario\n2. Mostrar todos los Usuarios\n3. Buscar Usuario\n4. Editar Usuario\n5. Borrar Usuario\n6. Volver al Menu Principal";
+            std::cout << "\n===Menu de Gestion de Usuarios ===\n1. Agregar Nuevo Usuario\n2. Mostrar todos los Usuarios\n3. Buscar Usuario\n4. Editar Usuario\n5. Borrar Usuario\n6. Volver al Menu Principal\n";
             std::cout << "Seleccione una opcion: ";
             std::cin >> opcionUsuarios;
 
@@ -194,48 +194,49 @@ int main(int argc, char *argv[]) {
             if (opcionUsuarios == '1')
             {
                 // codigo para agregar nuevo usuario
-                std::cout << "Ingrese los detalles del usuario:\n";
+                std::cin.ignore();
                 std::cout << "ID: ";
-                std::getline(std::cin >> std::ws, ID_Usuario);
-                clearIfNeeded(ID_Usuario, MAX_LINE);
+                std::getline(std::cin, ID_Usuario);
                 std::cout << "Nombre: ";
-                std::getline(std::cin >> std::ws, nombreU);
-                clearIfNeeded(nombreU, MAX_LINE);
+                std::getline(std::cin, nombreU);
                 std::cout << "Apellido: ";
-                std::getline(std::cin >> std::ws, apellidoU);
-                clearIfNeeded(apellidoU, MAX_LINE);
+                std::getline(std::cin, apellidoU);
                 std::cout << "Correo electronico: ";
-                std::getline(std::cin >> std::ws, correo);
-                clearIfNeeded(correo, MAX_LINE);
+                std::getline(std::cin, correo);
                 std::cout << "Contraseña: ";
-                std::getline(std::cin >> std::ws, contrasenya);
-                clearIfNeeded(contrasenya, MAX_LINE);
+                std::getline(std::cin, contrasenya);
+
+                std::string mensaje = "AgregarUsuario|" + ID_Usuario + "|" + nombreU + "|" + apellidoU + "|" + correo + "|" + contrasenya;
 
                 // enviar mensaje de "AgregarUsuario" al servidor
-                strcpy(sendBuff, "AgregarUsuario");
-                send(s, sendBuff, sizeof(sendBuff), 0);
-
-                // enviar detalles del usuario al servidor
-                send(s, ID_Usuario.c_str(), strlen(ID_Usuario.c_str()),0);
-                send(s, nombreU.c_str(), strlen(ID_Usuario.c_str()),0);
-                send(s, apellidoU.c_str(), strlen(ID_Usuario.c_str()),0);
-                send(s, correo.c_str(), strlen(ID_Usuario.c_str()),0);
-                send(s, contrasenya.c_str(), strlen(ID_Usuario.c_str()),0);
+                send(s, mensaje.c_str(), mensaje.length() +1, 0);
+                std::cout << "\nDetalles del usuario enviados al servidor\n";
 
                 // esperar la respuesta del servidor
-                recv(s, recvBuff, sizeof(recvBuff), 0);
-                std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+                int bytesReceived = recv(s, recvBuff, sizeof(recvBuff)-1, 0);
+                if(bytesReceived > 0) {
+                    recvBuff[bytesReceived] = '\0';
+                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+                }
             }
             else if(opcionUsuarios == '2')
             {
                 // codigo para mostrar todos los usuarios
                 // enviar mensaje de "MostrarUsuarios" al servidor
+                printf("\n");
+                std::cout << "\n======================== Usuarios en la Biblioteca ===============================" << std::endl;
+                std::cout << std::left << std::setw(10) << "ID" << std::setw(10) << "Nombre" << std::setw(20) << "Apellido" << std::setw(25) << "Correo" << std::setw(15) << "Contrasenya" << std::endl;               
+                std::cout << "==================================================================================" << std::endl;
                 strcpy(sendBuff, "MostrarUsuarios");
                 send(s, sendBuff, sizeof(sendBuff), 0);
 
-                // esperar la respuesta del servidor
-                recv(s, recvBuff, sizeof(recvBuff), 0);
-                std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+                int bytesReceived = recv(s, recvBuff, sizeof(recvBuff)-1, 0);
+                if(bytesReceived > 0) {
+                    recvBuff[bytesReceived] = '\0';
+                    std::cout << recvBuff << "\nDatos de usuarios recividos del servidor\n"  << std::endl;
+                } else {
+                    std::cerr << "\nError al recibir datos de libros del servidor.\n";
+                }
             }
             else if(opcionUsuarios == '3')
             {
