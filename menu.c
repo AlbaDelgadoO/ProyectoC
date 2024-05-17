@@ -712,7 +712,7 @@ char * generarInformeUsuarios(sqlite3* db) {
     if (userIDConMasPrestamos != NULL) {
         int numPrestamos = contarPrestamosPorUsuario(db, userIDConMasPrestamos);
         char usuarioMasPrestamosInfo[50];
-        sprintf(usuarioMasPrestamosInfo, "\tID: %s\n, \tNumero de prestamos: %d\n", (char*)userIDConMasPrestamos, numPrestamos);
+        sprintf(usuarioMasPrestamosInfo, "\tID: %s\n \tNumero de prestamos: %d\n", (char*)userIDConMasPrestamos, numPrestamos);
         strcat(informe, usuarioMasPrestamosInfo);
     } else {
         strcat(informe, "No hay usuarios registrados.\n");
@@ -726,9 +726,9 @@ char * generarInformeUsuarios(sqlite3* db) {
     //printf("\nNumero total de usuarios registrados: %d\n", contarUsuariosRegistrados(db));
 
     // Concatenar las opciones del menú al informe
-    strcat(informe, "\n1. Volver al Menu de Informes\n");
-    strcat(informe, "2. Volver al Menu Principal\n");
-    strcat(informe, "Seleccione una opcion: \n");
+    // strcat(informe, "\n1. Volver al Menu de Informes\n");
+    // strcat(informe, "2. Volver al Menu Principal\n");
+    // strcat(informe, "Seleccione una opcion: \n");
 
     // Liberar memoria utilizada por variables temporales
     free(userIDConMasPrestamos);
@@ -864,9 +864,9 @@ char* generarInformePrestamos(sqlite3* db) {
     }
 
     // Concatenar las opciones del menú al informe
-    strcat(informe, "\n1. Volver al Menu de Informes\n");
-    strcat(informe, "2. Volver al Menu Principal\n");
-    strcat(informe, "Seleccione una opcion: \n");
+    // strcat(informe, "\n1. Volver al Menu de Informes\n");
+    // strcat(informe, "2. Volver al Menu Principal\n");
+    // strcat(informe, "Seleccione una opcion: \n");
 
     // Devolver la cadena de caracteres con el informe generado
     return informe;
@@ -995,9 +995,9 @@ char* generarInformeLibros(sqlite3* db) {
     //printf("Numero total de libros: %d\n", numTotalLibros);
 
     // Concatenar las opciones del menú al informe
-    strcat(informe, "\n1. Volver al Menu de Informes\n");
-    strcat(informe, "2. Volver al Menu Principal\n");
-    strcat(informe, "Seleccione una opcion: \n");
+    // strcat(informe, "\n1. Volver al Menu de Informes\n");
+    // strcat(informe, "2. Volver al Menu Principal\n");
+    // strcat(informe, "Seleccione una opcion: \n");
 
     // Devolver la cadena de caracteres con el informe generado
     return informe;
