@@ -316,7 +316,20 @@ int main(int argc, char *argv[]) {
 				const char* confirmacion = "Devolucion registrada correctamente";
 				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
+			else if (strcmp(recvBuff, "GestionarProblemasPrestamo") == 0) {
+				// Código para gestionar problemas de préstamo
+				char idUsuario[50];
 
+				// Recibir el ID del usuario del cliente
+				recv(comm_socket, idUsuario, sizeof(idUsuario), 0);
+
+				// Llamar a la función en dataBase.c para obtener los préstamos pendientes del usuario
+				obtenerPrestamosPendientes(db, idUsuario);
+
+				// Enviar confirmación al cliente de que los préstamos pendientes han sido obtenidos
+				const char* confirmacion = "Prestamos pendientes obtenidos correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			}
 
 			//GENERACION DE INFORMES
 			// Esperar a que llegue un mensaje del cliente

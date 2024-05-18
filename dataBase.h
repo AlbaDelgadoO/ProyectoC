@@ -36,6 +36,7 @@ void crearTablaPrestamo(sqlite3* db);
 void insertarPrestamo(sqlite3* db, Prestamo p);
 void renovarPrestamoDB(sqlite3* db, char* idLibro);
 bool registrarDevolucionLibro(sqlite3* db, char* idLibro);
+void obtenerPrestamosPendientes(sqlite3* db, const char* idUsuario);
 
 //AUTOR
 void insertarAutor(sqlite3*db, Libro libro);

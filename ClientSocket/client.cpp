@@ -405,6 +405,21 @@ int main(int argc, char *argv[]) {
                     std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                 } else if (opcionPrestamos == '4') {
                     // Código para gestionar problemas de préstamo
+                    std::string idUsuario;
+
+                    std::cout << "Ingrese el ID del usuario: ";
+                    std::cin >> idUsuario;
+
+                    // Enviar el mensaje "GestionarProblemasPrestamo" al servidor
+                    strcpy(sendBuff, "GestionarProblemasPrestamo");
+                    send(s, sendBuff, sizeof(sendBuff), 0);
+
+                    // Enviar el ID del libro al servidor
+                    send(s, idUsuario.c_str(), strlen(idUsuario.c_str()), 0);
+
+                    // Esperar la respuesta del servidor
+                    recv(s, recvBuff, sizeof(recvBuff), 0);
+                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                 } else if (opcionPrestamos == '5') {
                     std::cout << "Volviendo al Menu Principal...\n";
                 } else {

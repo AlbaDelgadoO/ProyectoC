@@ -347,29 +347,8 @@ void buscarPrestamosPendientes(sqlite3* db) {
     printf("\nIngrese el ID del usuario para buscar sus prestamos pendientes: ");
     scanf("%s", idUsuario);
 
-    // Consultar la tabla Prestamo para obtener los préstamos pendientes del usuario especificado
-    char selectSql[200];
-    sprintf(selectSql, "SELECT ISBN_Libro, Fecha_Vencimiento FROM Prestamo WHERE ID_Usuario = '%s' AND Estado = 0", idUsuario);
-    sqlite3_stmt* stmt;
-    int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
-    if (result != SQLITE_OK) {
-        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
-        return;
-    }
-
-    // Mostrar los préstamos pendientes del usuario
-    printf("Prestamos pendientes del usuario %s:\n", idUsuario);
-    printf("ISBN_Libro\tFecha_Vencimiento\n");
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        const char* idLibro = (const char*)sqlite3_column_text(stmt, 0);
-        const char* fechaVencimiento = (const char*)sqlite3_column_text(stmt, 1);
-        printf("%s\t\t%s\n", idLibro, fechaVencimiento);
-    }
-
-    printf("\n");
-
-    // Liberar la consulta preparada
-    sqlite3_finalize(stmt);
+    // Llamar a la función en dataBase.c para obtener los préstamos pendientes
+    obtenerPrestamosPendientes(db, idUsuario);
 }
 
 void mostrarMenuPrestamos() {
