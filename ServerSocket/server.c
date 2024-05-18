@@ -6,6 +6,12 @@
 #include "../dataBase.h"
 #include "../sqlite3.h"
 
+#define USUARIO_EDITADO_CORRECTAMENTE 0
+#define USUARIO_NO_EXISTE 1
+#define ERROR_EDICION_USUARIO 2
+#define ERROR_BORRANDO_USUARIO 3
+#define USUARIO_BORRADO_CORRECTAMENTE 4
+
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
 
@@ -161,7 +167,6 @@ int main(int argc, char *argv[]) {
 				strncpy(contrasenya, token,49); contrasenya[49] = '\0'; token = strtok(NULL, "|");
 
 
-
 				// Crear un nuevo usuario
 				Usuario nuevoUsuario;
 				strncpy(nuevoUsuario.ID_Usuario, ID_Usuario,50);
@@ -171,30 +176,84 @@ int main(int argc, char *argv[]) {
 				strncpy(nuevoUsuario.contrasenya, contrasenya, 50);
 
 				// Insertar usuario en la BD
-				insertarUsuario(db, nuevoUsuario);
+    			int respuesta = insertarUsuarioServer(db, nuevoUsuario);
 
-				// Enviar confirmación al cliente de que el préstamo ha sido insertado
-				const char* confirmacion = "Usuario insertado correctamente";
-				send(comm_socket, confirmacion, strlen(confirmacion) + 1, 0);
+    			// Enviar confirmación al cliente de que el usuario ha sido insertado
+    			char mensaje[100];  // Ajuste de tamaño según sea necesario
+    			if (respuesta == 1) {
+        		strcpy(mensaje, "Usuario insertado correctamente");
+    			} else {
+       			 strcpy(mensaje, "Error al insertar usuario, revise los datos");
+    			}
+
+    			if (send(comm_socket, mensaje, strlen(mensaje) + 1, 0) == -1) {
+        		perror("send");
+        		// Manejo de error, cerrar la conexión o similar
+    			}
 			}
 			else if(strcmp(recvBuff, "MostrarUsuarios") == 0) {
 				char* usuarios = obtenerUsuarios(db);
 				send(comm_socket, usuarios, strlen(usuarios)+1, 0);
 				free(usuarios);
 			}
-			else if(strcmp(recvBuff, "BuscarUsuario") == 0) {
-				// Código para agregar un nuevo usuario
+			else if(strncmp(recvBuff, "BuscarUsuario", 13) == 0) {
+				// Código para buscar usuario
+				char* token = strtok(recvBuff, "|");
+				token = strtok(NULL, "|");
 				char termino[50];
-
-				// Recibir los detalles del usuario
-				recv(comm_socket, termino, sizeof(termino), 0);
+				if (token != NULL) {
+					strncpy(termino, token, 49);
+					termino[49] = '\0';
+				}
 
 				// Buscar usuario en la BD
-				buscarUsuariosDB(db, termino);
+				char* usuarios = buscarUsuariosServer(db, termino);
 
-				// Enviar confirmación al cliente de que el préstamo ha sido insertado
-				//const char* confirmacion = "Resultados mostrados correctamente";
-				//send(comm_socket, confirmacion, strlen(confirmacion), 0);
+				send(comm_socket, usuarios, strlen(usuarios) + 1, 0);
+				free(usuarios);
+			}
+
+			else if(strncmp(recvBuff, "EditarUsuario", 13) == 0) {
+				char* token = strtok(recvBuff, "|");
+				char id[50] = {0}, nombre[50] = {0}, apellido[50] = {0}, correo[100] = {0}, contrasenya[50] = {0};
+
+				token = strtok(NULL, "|");
+				if (token != NULL) strncpy(id, token, 49); token = strtok(NULL, "|");
+				if (token != NULL) strncpy(nombre, token, 49); token = strtok(NULL, "|");
+				if (token != NULL) strncpy(apellido, token, 49); token = strtok(NULL, "|");
+				if (token != NULL) strncpy(correo, token, 99); token = strtok(NULL, "|");
+				if (token != NULL) strncpy(contrasenya, token, 49);
+
+				int resultado = editarUsuarioServidor(db, id, nombre, apellido, correo, contrasenya);
+
+				char mensaje[256];
+				if (resultado == USUARIO_EDITADO_CORRECTAMENTE) {
+					strcpy(mensaje, "Usuario editado correctamente");
+				} else if (resultado == USUARIO_NO_EXISTE) {
+					strcpy(mensaje, "El usuario con el ID especificado no existe");
+				} else {
+					strcpy(mensaje, "Error al editar usuario");
+				}
+				send(comm_socket, mensaje, strlen(mensaje) + 1, 0);
+			}
+
+			else if(strncmp(recvBuff, "BorrarUsuario",13) == 0) {
+				char* token = strtok(recvBuff, "|");
+				char id[50] = {0};
+				token = strtok(NULL, "|");
+				if (token != NULL) strncpy(id, token, 49); token = strtok(NULL, "|");
+
+				int resultado = borrarUsuarioServidor(db, id);
+
+				char mensaje[256];
+				if (resultado == USUARIO_BORRADO_CORRECTAMENTE) {
+					strcpy(mensaje, "Usuario borrado correctamente");
+				} else if (resultado == USUARIO_NO_EXISTE) {
+					strcpy(mensaje, "El usuario con el ID especificado no existe");
+				} else {
+					strcpy(mensaje, "Error al editar usuario");
+				}
+				send(comm_socket, mensaje, strlen(mensaje) + 1, 0);
 			}
 
 

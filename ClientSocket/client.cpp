@@ -203,7 +203,7 @@ int main(int argc, char *argv[]) {
                 std::getline(std::cin, apellidoU);
                 std::cout << "Correo electronico: ";
                 std::getline(std::cin, correo);
-                std::cout << "Contraseña: ";
+                std::cout << "Contrasenya: ";
                 std::getline(std::cin, contrasenya);
 
                 std::string mensaje = "AgregarUsuario|" + ID_Usuario + "|" + nombreU + "|" + apellidoU + "|" + correo + "|" + contrasenya;
@@ -223,7 +223,6 @@ int main(int argc, char *argv[]) {
             {
                 // codigo para mostrar todos los usuarios
                 // enviar mensaje de "MostrarUsuarios" al servidor
-                printf("\n");
                 std::cout << "\n======================== Usuarios en la Biblioteca ===============================" << std::endl;
                 std::cout << std::left << std::setw(10) << "ID" << std::setw(10) << "Nombre" << std::setw(20) << "Apellido" << std::setw(25) << "Correo" << std::setw(15) << "Contrasenya" << std::endl;               
                 std::cout << "==================================================================================" << std::endl;
@@ -238,36 +237,95 @@ int main(int argc, char *argv[]) {
                     std::cerr << "\nError al recibir datos de libros del servidor.\n";
                 }
             }
-            else if(opcionUsuarios == '3')
-            {
+            else if(opcionUsuarios == '3') {
                 std::string termino;
-                // codigo para buscar usuario
+                // Código para buscar usuario
+                std::cin.ignore();
+
                 std::cout << "Ingrese el ID o nombre del usuario: ";
-                std::getline(std::cin >> std::ws, termino);
-                clearIfNeeded(termino, MAX_LINE);
+                std::getline(std::cin, termino);
 
-                // enviar mensaje de "BuscarUsuario" al servidor
-                strcpy(sendBuff, "BuscarUsuario");
-                send(s, sendBuff, sizeof(sendBuff), 0);
+                // Enviar mensaje de "BuscarUsuario" al servidor
+                std::string mensaje = "BuscarUsuario|" + termino;
+                send(s, mensaje.c_str(), mensaje.length() + 1, 0);
+                std::cout << "\nDetalles del usuario enviados al servidor\n";
 
-                // enviar detalles del usuario al servidor
-                send(s, termino.c_str(), strlen(termino.c_str()),0);
+                std::cout << "\n======================== Coincidencias encontradas ===============================\n";
+                std::cout << std::left << std::setw(10) << "ID" << std::setw(10) << "Nombre" << std::setw(20) << "Apellido" << std::setw(25) << "Correo" << std::setw(15) << "Contraseña" << std::endl;
+                std::cout << "==================================================================================\n";
 
-                // esperar la respuesta del servidor
-                recv(s, recvBuff, sizeof(recvBuff), 0);
-                std::cout << "Respuesta del servidor: " << recvBuff << "\n";
+
+                // Esperar la respuesta del servidor
+                int bytesReceived = recv(s, recvBuff, sizeof(recvBuff) - 1, 0);
+                if (bytesReceived > 0) {
+                    recvBuff[bytesReceived] = '\0';
+                    std::cout << recvBuff << "\nDatos de usuarios recibidos del servidor\n" << std::endl;
+                } else {
+                    std::cerr << "\nError al recibir datos de usuarios del servidor.\n";
+                }
             }
             else if(opcionUsuarios == '4')
             {
-                // codigo para editar usuario
+                // codigo para editar un usuario
+                std::string id, nombreNuevo, apellidoNuevo, correoNuevo, contraNueva;
+
+                std::cout << "Introduce el ID del usuario que deseas editar: ";
+                std::cin >> id;
+
+                std::cout << "Introduce el nuevo nombre: ";
+                std::cin >> nombreNuevo;
+
+                std::cout << "Introduce el nuevo apellido: ";
+                std::cin >> apellidoNuevo;
+
+                std::cout << "Introduce el nuevo correo: ";
+                std::cin >> correoNuevo;
+
+                std::cout << "Introduce la nueva contraseña: ";
+                std::cin >> contraNueva;
+
+                std::string mensaje = "EditarUsuario|" + id + "|" + nombreNuevo + "|" + apellidoNuevo + "|" + correoNuevo + "|" + contraNueva;
+                send(s, mensaje.c_str(), mensaje.length(), 0);
+
+                // Recibir la respuesta del servidor
+                char recvBuff[1024];
+                int bytesReceived = recv(s, recvBuff, sizeof(recvBuff) - 1, 0);
+                if (bytesReceived > 0) {
+                    recvBuff[bytesReceived] = '\0';
+                    std::cout << recvBuff << std::endl;
+                } else {
+                    std::cerr << "Error al recibir respuesta del servidor." << std::endl;
+                }
             }
             else if(opcionUsuarios == '5')
             {
                 // codigo para borrar usuario
+                std::string id;
+
+                std::cout << "Introduce el ID del usuario que deseas borrar: ";
+                std::cin >> id;
+
+                std::string mensaje = "BorrarUsuario|" + id;
+                send(s, mensaje.c_str(), mensaje.length(), 0);
+
+                // Recibir la respuesta del servidor
+                char recvBuff[1024];
+                int bytesReceived = recv(s, recvBuff, sizeof(recvBuff) - 1, 0);
+                if (bytesReceived > 0) {
+                    recvBuff[bytesReceived] = '\0';
+                    std::cout << recvBuff << std::endl;
+                } else {
+                    std::cerr << "Error al recibir respuesta del servidor." << std::endl;
+                }
             }
             else if(opcionUsuarios == '6')
             {
                 // codigo para volver al menu principal
+                std::cout << "Volviendo al Menu Principal...\n";
+            }
+            else
+            {
+                std::cout << "Opcion invalida\n";
             }
             
             } while(opcionUsuarios != '6');
@@ -429,15 +487,17 @@ int main(int argc, char *argv[]) {
             } while(opcionInformes != '4');
             break;
     
-    }
-    std::cout << "Cerrando socket... \n";
+        }
+   
+    } while(opcion != 'q');
+
+     std::cout << "Cerrando socket... \n";
     strcpy(sendBuff, "Bye");
     send(s, sendBuff, sizeof(sendBuff), 0);
 
     // CLOSING the socket and cleaning Winsock...
     closesocket(s);
     WSACleanup();
-    }while(opcion != 'q');
 
     return 0;
 }

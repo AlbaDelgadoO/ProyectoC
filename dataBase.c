@@ -5,6 +5,12 @@
 #include <string.h>
 #include "menu.h"
 
+#define USUARIO_EDITADO_CORRECTAMENTE 0
+#define USUARIO_NO_EXISTE 1
+#define ERROR_EDICION_USUARIO 2
+#define ERROR_BORRANDO_USUARIO 3
+#define USUARIO_BORRADO_CORRECTAMENTE 4
+
 // Implementación de las funciones para interactuar con la base de datos
 sqlite3* inicializarBaseDatos(const char* nombreArchivo) {
     sqlite3* db;
@@ -277,6 +283,34 @@ void insertarUsuario(sqlite3* db, Usuario usuario) {
     sqlite3_finalize(stmt);
 }
 
+int insertarUsuarioServer(sqlite3* db, Usuario usuario) {
+    char* sql = "INSERT INTO Usuario (ID_Usuario, Nombre, Apellido, Correo, Contrasenya) VALUES (?, ?, ?, ?, ?)";
+
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return 0;
+    }
+
+    sqlite3_bind_text(stmt, 1, usuario.ID_Usuario, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, usuario.nombreU, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, usuario.apellidoU, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, usuario.correo, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 5, usuario.contrasenya, -1, SQLITE_STATIC);
+
+
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        sqlite3_finalize(stmt);
+        return 0;
+    } else {
+        return 1;
+    }
+    printf("\n");
+
+    sqlite3_finalize(stmt);
+
+}
+
 void leerUsuarios(sqlite3* db) {
     char* sql = "SELECT * FROM Usuario";
     sqlite3_stmt* stmt;
@@ -305,7 +339,7 @@ void leerUsuarios(sqlite3* db) {
 
 // funcion adaptada para cliente-servidor
 char* obtenerUsuarios(sqlite3* db) {
-    char* usuarios = malloc(4096* sizeof(char));
+    char* usuarios = malloc((4096*5)* sizeof(char));
     usuarios[0] = '\0';
     sqlite3_stmt* stmt;
     const char* sql = "SELECT * FROM Usuario";
@@ -365,6 +399,101 @@ void buscarUsuariosDB(sqlite3* db, char* termino) {
 
     sqlite3_finalize(stmt);
 }
+
+char* buscarUsuariosServer(sqlite3* db, char* termino) {
+    char* result = malloc(4096 * sizeof(char));
+    result[0] = '\0';
+
+    // Preparar término para LIKE
+    char likeTermino[52];  // 50 + 2 para '%' y '\0'
+    snprintf(likeTermino, sizeof(likeTermino), "%%%s%%", termino);
+
+    const char* sql = "SELECT * FROM Usuario WHERE ID_Usuario LIKE ? OR Nombre LIKE ?";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        strcpy(result, "Error al buscar usuario en la base de datos");
+        return result;
+    }
+
+    // Bindear los parámetros a la consulta
+    sqlite3_bind_text(stmt, 1, likeTermino, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, likeTermino, -1, SQLITE_STATIC);
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        const unsigned char* id = sqlite3_column_text(stmt, 0);
+        const unsigned char* nombre = sqlite3_column_text(stmt, 1);
+        const unsigned char* apellido = sqlite3_column_text(stmt, 2);
+        const unsigned char* correo = sqlite3_column_text(stmt, 3);
+        const unsigned char* contr = sqlite3_column_text(stmt, 4);
+
+        sprintf(result + strlen(result), "%-10s %-10s %-20s %-25s %-15s\n", id, nombre, apellido, correo, contr);
+    }
+
+    sqlite3_finalize(stmt);
+    return result;
+}
+
+int editarUsuarioServidor(sqlite3* db, const char* id, const char* nombre, const char* apellido, const char* correo, const char* contrasenya) {
+    char* sql = "UPDATE Usuario SET Nombre = ?, Apellido = ?, Correo = ?, Contrasenya = ? WHERE ID_Usuario = ?";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return ERROR_EDICION_USUARIO;
+    }
+
+    sqlite3_bind_text(stmt, 1, nombre, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, apellido, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 3, correo, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 4, contrasenya, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 5, id, -1, SQLITE_STATIC);
+
+    int result = sqlite3_step(stmt);
+    if (result == SQLITE_DONE) {
+        if (sqlite3_changes(db) > 0) {
+            sqlite3_finalize(stmt);
+            return USUARIO_EDITADO_CORRECTAMENTE;
+        } else {
+            sqlite3_finalize(stmt);
+            return USUARIO_NO_EXISTE;
+        }
+    } else {
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        return ERROR_EDICION_USUARIO;
+    }
+}
+
+int borrarUsuarioServidor(sqlite3* db, const char* id) {
+    char* sql = "DELETE FROM Usuario WHERE ID_Usuario = ?";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return ERROR_BORRANDO_USUARIO;
+    }
+
+    sqlite3_bind_text(stmt, 1, id, -1, SQLITE_STATIC);
+    
+    int result = sqlite3_step(stmt);
+    if (result == SQLITE_DONE) {
+        if (sqlite3_changes(db) > 0) {
+            sqlite3_finalize(stmt);
+            return USUARIO_BORRADO_CORRECTAMENTE;
+        } else {
+            sqlite3_finalize(stmt);
+            return USUARIO_NO_EXISTE;
+        }
+    } else {
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(stmt);
+        return ERROR_BORRANDO_USUARIO;
+    }
+
+}
+
 
 
 void modificarContra(sqlite3* db, char* contraNueva, char* id) {

@@ -15,9 +15,13 @@ char* obtenerLibro(sqlite3* db, const char* termino);
 
 void crearTablaUsuario(sqlite3* db);
 void insertarUsuario(sqlite3* db, Usuario usuario);
+int insertarUsuarioServer(sqlite3* db, Usuario usuario);
 void leerUsuarios(sqlite3* db);
 char* obtenerUsuarios(sqlite3* db);
 void buscarUsuariosDB(sqlite3* db, char* termino);
+char* buscarUsuariosServer(sqlite3* db, char* termino);
+int editarUsuarioServidor(sqlite3* db, const char* id, const char* nombre, const char* apellido, const char* correo, const char* contrasenya);
+int borrarUsuarioServidor(sqlite3* db, const char* id);
 
 void modificarContra(sqlite3* db, char* contraNueva, char* id);
 void modificarCorreo(sqlite3* db, char* correoNuevo, char* id);
