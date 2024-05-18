@@ -158,10 +158,14 @@ int main(int argc, char *argv[]) {
                         //Codigo para buscar un libro
                         std::string terminoBusqueda;
                         std::cout << "Ingrese el termino de busqueda (titulo, genero o autor): ";
-                        std::getline(std::cin, terminoBusqueda);
+                        std::getline(std::cin >> std::ws, terminoBusqueda);
+
+                        //Codigo para buscar un libro
+                        strcpy(sendBuff, "BuscarLibro");
+                        send(s, sendBuff, sizeof(sendBuff), 0); 
 
                         // Enviar el término de búsqueda al servidor
-                        send(s, terminoBusqueda.c_str(), terminoBusqueda.length() + 1, 0);
+                        send(s, terminoBusqueda.c_str(), terminoBusqueda.length(), 0);
 
                         // Recibir y mostrar los resultados de la búsqueda del servidor
                         int bytesReceived = recv(s, recvBuff, sizeof(recvBuff), 0);

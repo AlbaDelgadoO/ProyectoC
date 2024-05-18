@@ -143,13 +143,13 @@ int main(int argc, char *argv[]) {
 			else if (strcmp(recvBuff, "BuscarLibro") == 0) 
 			{
 				// Recibir el término de búsqueda del cliente
-				char terminoBusqueda[100];
+				char terminoBusqueda[100] = "";
 				recv(comm_socket, terminoBusqueda, sizeof(terminoBusqueda), 0);
 
 				// Buscar el libro en la base de datos y enviar los detalles al cliente
-				char* librosData = obtenerLibro(db, terminoBusqueda);
-				send(comm_socket, librosData, strlen(librosData) + 1, 0); // Enviar los detalles de los libros al cliente
-				free(librosData); // Liberar la memoria utilizada
+				char* libroData = obtenerLibro(db, terminoBusqueda);
+				send(comm_socket, libroData, strlen(libroData) + 1, 0); // Enviar los detalles de los libros al cliente
+				free(libroData); // Liberar la memoria utilizada
 			}
 
 			// GESTIÓN DE USUARIOS

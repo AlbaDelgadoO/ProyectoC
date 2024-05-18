@@ -185,7 +185,7 @@ char* obtenerLibro(sqlite3* db, const char* termino) {
     char* librosData = malloc(4096 * sizeof(char)); // Reservar memoria para almacenar los datos de los libros
     librosData[0] = '\0'; // Inicializar la cadena vacía
     sqlite3_stmt* stmt;
-    const char* sql = "SELECT * FROM Libro WHERE Titulo LIKE '%' || ? || '%' OR Nom_Autor LIKE '%' || ? || '%' OR Genero LIKE '%' || ? || '%' OR Apellido_A LIKE '%' || ? || '%'";
+    char* sql = "SELECT * FROM Libro WHERE Titulo LIKE '%' || ? || '%' OR Nom_Autor LIKE ? OR Genero LIKE ?";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
         strcpy(librosData, "Error al buscar el libro en la base de datos.");
