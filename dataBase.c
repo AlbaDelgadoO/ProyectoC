@@ -52,8 +52,12 @@ void insertarLibro(sqlite3* db, Libro libro) {
         return;
     }
 
+    char isbn[14];
+    strncpy(isbn, libro.ISBN, 13);
+    isbn[13] = '\0';
+
     // Bindear los parámetros a la declaración SQL
-    sqlite3_bind_text(stmt, 1, libro.ISBN, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 1, isbn, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 2, libro.titulo, -1, SQLITE_STATIC); 
     sqlite3_bind_text(stmt, 3, libro.genero, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, libro.nom_autor, -1, SQLITE_STATIC);
