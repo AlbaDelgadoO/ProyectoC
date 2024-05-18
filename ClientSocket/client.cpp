@@ -344,25 +344,21 @@ int main(int argc, char *argv[]) {
                 std::cin >> opcionPrestamos; // Captura la opción seleccionada por el usuario
 
                 if (opcionPrestamos == '1') {
-                    // Código para agregar un nuevo préstamo
+                    // Solicitar detalles del nuevo préstamo al usuario
                     std::string idLibro, idUsuario, fechaVencimiento;
 
-                    // Solicitar detalles del nuevo préstamo al usuario
-                    std::cout << "Ingrese el ID del libro: ";
+                    std::cout << "Ingrese el ISBN del libro: ";
                     std::cin >> idLibro;
                     std::cout << "Ingrese el ID del usuario: ";
                     std::cin >> idUsuario;
                     std::cout << "Ingrese la fecha de vencimiento (AAAA-MM-DD): ";
                     std::cin >> fechaVencimiento;
 
-                    // Enviar el mensaje "AgregarPrestamo" al servidor
-                    strcpy(sendBuff, "AgregarPrestamo");
-                    send(s, sendBuff, sizeof(sendBuff), 0);
+                    // Crear el mensaje para enviar al servidor
+                    std::string mensaje = "AgregarPrestamo|" + idLibro + "|" + idUsuario + "|" + fechaVencimiento;
 
-                    // Enviar los detalles del préstamo al servidor
-                    send(s, idLibro.c_str(), strlen(idLibro.c_str()), 0);
-                    send(s, idUsuario.c_str(), strlen(idUsuario.c_str()), 0);
-                    send(s, fechaVencimiento.c_str(), strlen(fechaVencimiento.c_str()), 0);
+                    // Enviar el mensaje al servidor
+                    send(s, mensaje.c_str(), mensaje.length() + 1, 0);
 
                     // Esperar la respuesta del servidor
                     recv(s, recvBuff, sizeof(recvBuff), 0);

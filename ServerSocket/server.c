@@ -258,32 +258,39 @@ int main(int argc, char *argv[]) {
 
 
 			// GESTIÓN DE PRESTAMOS
-			else if (strcmp(recvBuff, "AgregarPrestamo") == 0) {
-				// Código para agregar un nuevo préstamo
-				char idLibro[13], idUsuario[13], fechaVencimiento[20];
+			else if (strncmp(recvBuff, "AgregarPrestamo|", 15) == 0) {
+                // Código para agregar un nuevo préstamo
+                char* token;
+                token = strtok(recvBuff, "|");
+                token = strtok(NULL, "|"); // Skip "AgregarPrestamo"
 
-				// Recibir los detalles del préstamo del cliente
-				recv(comm_socket, idLibro, sizeof(idLibro), 0);
-				recv(comm_socket, idUsuario, sizeof(idUsuario), 0);
-				recv(comm_socket, fechaVencimiento, sizeof(fechaVencimiento), 0);
+                char idLibro[13], idUsuario[13], fechaVencimiento[20];
+
+                strncpy(idLibro, token, 12); idLibro[12] = '\0'; token = strtok(NULL, "|");
+                strncpy(idUsuario, token, 12); idUsuario[12] = '\0'; token = strtok(NULL, "|");
+                strncpy(fechaVencimiento, token, 19); fechaVencimiento[19] = '\0';
+
+				printf("ID Libro: %s\n", idLibro);
+				printf("ID Usuario: %s\n", idUsuario);
+				printf("Fecha de vencimiento: %s\n", fechaVencimiento);
 
 
-				// Crear una instancia de Prestamo con los detalles ingresados por el usuario
-				Prestamo nuevoPrestamo;
-				strcpy(nuevoPrestamo.ISBN, idLibro);
-				strcpy(nuevoPrestamo.ID_Usuario, idUsuario);
-				strcpy(nuevoPrestamo.fechaDevolucion, fechaVencimiento);
+                // Crear una instancia de Prestamo con los detalles recibidos
+                Prestamo nuevoPrestamo;
+                strcpy(nuevoPrestamo.ISBN, idLibro);
+                strcpy(nuevoPrestamo.ID_Usuario, idUsuario);
+                strcpy(nuevoPrestamo.fechaDevolucion, fechaVencimiento);
 
-				// Insertar el nuevo prestamo en la base de datos
-				insertarPrestamo(db, nuevoPrestamo);
+                // Insertar el nuevo préstamo en la base de datos
+                insertarPrestamo(db, nuevoPrestamo);
 
-				// Enviar confirmación al cliente de que el préstamo ha sido insertado
-				const char* confirmacion = "Prestamo insertado correctamente";
-				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+                // Enviar confirmación al cliente de que el préstamo ha sido insertado
+                const char* confirmacion = "Prestamo insertado correctamente";
+                send(comm_socket, confirmacion, strlen(confirmacion) + 1, 0);  // Add +1 to include the null terminator
 			}
 			else if (strcmp(recvBuff, "RenovarPrestamo") == 0) {
 				// Código para renovar un préstamo existente
-				char idLibro[20];
+				char idLibro[13];
 
 				// Recibir el ID del libro del cliente
 				recv(comm_socket, idLibro, sizeof(idLibro), 0);
@@ -297,7 +304,7 @@ int main(int argc, char *argv[]) {
 			}
 			else if (strcmp(recvBuff, "DevolverLibro") == 0) {
 				// Código para registrar la devolución de un libro
-				char idLibro[15];
+				char idLibro[13];
 
 				// Recibir el ID del libro del cliente
 				recv(comm_socket, idLibro, sizeof(idLibro), 0);
