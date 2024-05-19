@@ -3,6 +3,7 @@
 #include <string>
 #include <winsock2.h>
 #include <iomanip>
+#include "menu.h"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000
@@ -39,6 +40,7 @@ int main(int argc, char *argv[]) {
     SOCKET s;
     struct sockaddr_in server;
     char sendBuff[512], recvBuff[512];
+    //sqlite3 *db;
 
     std::cout << "\nInitialising Winsock...\n";
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -417,9 +419,9 @@ int main(int argc, char *argv[]) {
             std::cout << "Configuracion del Sistema \n";
             strcpy(sendBuff, "EliminarUsuario");
             send(s, sendBuff, sizeof(sendBuff), 0);
-            strcpy(sendBuff, "01");
-            send(s, sendBuff, sizeof(sendBuff), 0);
+            //ejecutarMenuConfiguracion(db,sendBuff,recvBuff,s);
             break;
+
 
         case '5':
             char opcionInformes;
