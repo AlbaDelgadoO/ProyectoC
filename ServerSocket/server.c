@@ -182,6 +182,7 @@ int main(int argc, char *argv[]) {
     			char mensaje[100];  // Ajuste de tamaño según sea necesario
     			if (respuesta == 1) {
         		strcpy(mensaje, "Usuario insertado correctamente");
+				printf("Usuario agregado\n");
     			} else {
        			 strcpy(mensaje, "Error al insertar usuario, revise los datos");
     			}
@@ -195,6 +196,7 @@ int main(int argc, char *argv[]) {
 				char* usuarios = obtenerUsuarios(db);
 				send(comm_socket, usuarios, strlen(usuarios)+1, 0);
 				free(usuarios);
+				printf("Usuarios mostrados\n");
 			}
 			else if(strncmp(recvBuff, "BuscarUsuario", 13) == 0) {
 				// Código para buscar usuario
@@ -210,6 +212,7 @@ int main(int argc, char *argv[]) {
 				char* usuarios = buscarUsuariosServer(db, termino);
 
 				send(comm_socket, usuarios, strlen(usuarios) + 1, 0);
+				printf("Busqueda realizada\n");
 				free(usuarios);
 			}
 
@@ -229,11 +232,12 @@ int main(int argc, char *argv[]) {
 				char mensaje[256];
 				if (resultado == USUARIO_EDITADO_CORRECTAMENTE) {
 					strcpy(mensaje, "Usuario editado correctamente");
+					printf("Usuario editado\n");
 				} else if (resultado == USUARIO_NO_EXISTE) {
 					strcpy(mensaje, "El usuario con el ID especificado no existe");
 				} else {
 					strcpy(mensaje, "Error al editar usuario");
-				}
+					printf("Error editando usuario\n");				}
 				send(comm_socket, mensaje, strlen(mensaje) + 1, 0);
 			}
 
@@ -248,10 +252,12 @@ int main(int argc, char *argv[]) {
 				char mensaje[256];
 				if (resultado == USUARIO_BORRADO_CORRECTAMENTE) {
 					strcpy(mensaje, "Usuario borrado correctamente");
+					printf("Usuario borrado\n");
 				} else if (resultado == USUARIO_NO_EXISTE) {
 					strcpy(mensaje, "El usuario con el ID especificado no existe");
 				} else {
 					strcpy(mensaje, "Error al editar usuario");
+					printf("Error borrando usuario\n");
 				}
 				send(comm_socket, mensaje, strlen(mensaje) + 1, 0);
 			}

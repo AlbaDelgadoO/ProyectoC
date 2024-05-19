@@ -17,7 +17,7 @@ void clearIfNeeded(std::string &str, int max_line)
 
 char mostrarMenu()
 {
-    std::cout << "1. Gestion de Libros\n";
+    std::cout << "\n1. Gestion de Libros\n";
     std::cout << "2. Gestion de Usuarios\n";
     std::cout << "3. Gestion de Prestamos\n";
     std::cout << "4. Configuracion del Sistema\n";
