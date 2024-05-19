@@ -347,29 +347,8 @@ void buscarPrestamosPendientes(sqlite3* db) {
     printf("\nIngrese el ID del usuario para buscar sus prestamos pendientes: ");
     scanf("%s", idUsuario);
 
-    // Consultar la tabla Prestamo para obtener los préstamos pendientes del usuario especificado
-    char selectSql[200];
-    sprintf(selectSql, "SELECT ISBN_Libro, Fecha_Vencimiento FROM Prestamo WHERE ID_Usuario = '%s' AND Estado = 0", idUsuario);
-    sqlite3_stmt* stmt;
-    int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
-    if (result != SQLITE_OK) {
-        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
-        return;
-    }
-
-    // Mostrar los préstamos pendientes del usuario
-    printf("Prestamos pendientes del usuario %s:\n", idUsuario);
-    printf("ISBN_Libro\tFecha_Vencimiento\n");
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
-        const char* idLibro = (const char*)sqlite3_column_text(stmt, 0);
-        const char* fechaVencimiento = (const char*)sqlite3_column_text(stmt, 1);
-        printf("%s\t\t%s\n", idLibro, fechaVencimiento);
-    }
-
-    printf("\n");
-
-    // Liberar la consulta preparada
-    sqlite3_finalize(stmt);
+    // Llamar a la función en dataBase.c para obtener los préstamos pendientes
+    obtenerPrestamosPendientes(db, idUsuario);
 }
 
 void mostrarMenuPrestamos() {
@@ -426,7 +405,7 @@ void crearFicheroLog(){
 }
 
 
-void leerFicheroConfiguracion(){
+void leerFicheroConfiguracion(char *sendBuff, SOCKET comm_socket){
     FILE*archivo;
     char linea[100];
 
@@ -438,8 +417,12 @@ void leerFicheroConfiguracion(){
 
     printf("\n=== FICHERO DE CONFIGURACION ===\n");
     while(fgets(linea, sizeof(linea), archivo) !=NULL){
-        printf("%s", linea);
+        //printf("%s", linea);
+        sprintf(sendBuff, "%s", linea);
+        send(comm_socket, sendBuff, strlen(sendBuff), 0);
     };
+    sprintf(sendBuff, "FIN");
+    send(comm_socket, sendBuff, strlen(sendBuff), 0);
     fclose(archivo);
 }
 
@@ -450,14 +433,14 @@ void mostrarMenuConfiguracionFicheros(){
     printf("Seleccione una opcion: ");
 }
 
-void ejecutarMenuConfiguracionFicheros(sqlite3*db){
+void ejecutarMenuConfiguracionFicheros(sqlite3*db, char *sendBuff, char *recvBuff, SOCKET comm_socket){
     int opcion;
     do{
-        mostrarMenuConfiguracionFicheros();
-        scanf("%d", &opcion);
+        recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+        sscanf(recvBuff,"%d", &opcion);
         switch(opcion){
             case 1:
-                leerFicheroConfiguracion();
+                leerFicheroConfiguracion(sendBuff, comm_socket);
                 break;
             case 2:
                 printf("Volviendo al menu de configuracion del sistema...");
@@ -525,28 +508,29 @@ void mostrarMenuConfiguracionParametros(){
 
 }
 
-void ejecutarMenuConfiguracionParametros(sqlite3* db){
+void ejecutarMenuConfiguracionParametros(sqlite3* db, char *sendBuff, char *recvBuff, SOCKET comm_socket){
     int opcion;
     char nuevoValor[50];
      do{
-       mostrarMenuConfiguracionParametros();
+       //mostrarMenuConfiguracionParametros();
+        recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
         scanf("%d", &opcion);
         switch (opcion){
         case 1:
-            printf("\nIngrese la nueva duración maxima de prestamo (en dias): ");
-            scanf("%49s", nuevoValor);
+            recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+            sscanf(recvBuff,"%s", nuevoValor);
             actualizarParametros("DuracionMaximaPrestamo", nuevoValor);
             
             break;
         case 2: 
-            printf("\nIngrese la nueva cantidad maxima de libros prestados por usuario: ");
-            scanf("%49s", nuevoValor);
+            recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+            sscanf(recvBuff,"%s", nuevoValor);
             actualizarParametros("CantidadMaximaLibros", nuevoValor);
             
             break;
         case 3:
-            printf("\nIngrese el nuevo numero de dias de sanción en caso de devolución tardia por dia: ");
-            scanf("%49s", nuevoValor);
+            recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+            sscanf(recvBuff,"%s", nuevoValor);
             actualizarParametros("MultaDevolucionTardia", nuevoValor);
             
             break;
@@ -1029,17 +1013,17 @@ char* generarInformeLibros(sqlite3* db) {
 
 // MENU PRINCIPAL
 
-void ejecutarMenuConfiguracion(sqlite3* db){
+void ejecutarMenuConfiguracion(sqlite3* db, char *sendBuff, char *recvBuff, SOCKET comm_socket){
     int opcion; 
     do{
-        mostrarMenuConfiguracion();
-        scanf("%d", &opcion);
+       recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+        sscanf(recvBuff,"%d",&opcion);
         switch (opcion){
         case 1:
-            ejecutarMenuConfiguracionFicheros(db);
+            ejecutarMenuConfiguracionFicheros(db,sendBuff,recvBuff,comm_socket);
             break;
         case 2: 
-            ejecutarMenuConfiguracionParametros(db);
+            ejecutarMenuConfiguracionParametros(db,sendBuff,recvBuff,comm_socket);
             break;
         case 3:
             printf("\n");
@@ -1063,7 +1047,7 @@ void mostrarMenuPrincipal() {
     printf("Seleccione una opcion: ");
 }
 
-void ejecutarMenuPrincipal(sqlite3* db) {
+void ejecutarMenuPrincipal(sqlite3* db, char *sendBuff, char *recvBuff, SOCKET comm_socket) {
     int opcion;
     do {
         mostrarMenuPrincipal();
@@ -1079,7 +1063,7 @@ void ejecutarMenuPrincipal(sqlite3* db) {
                 ejecutarMenuPrestamos(db);
                 break;
             case 4:
-                ejecutarMenuConfiguracion(db);
+                ejecutarMenuConfiguracion(db,sendBuff, recvBuff, comm_socket);
                 break;
             case 5:
                 ejecutarMenuInformes(db);

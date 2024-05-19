@@ -1,10 +1,11 @@
 #ifndef MENU_H
 #define MENU_H
 #include <stdbool.h>
+#include <winsock2.h>
 #include "sqlite3.h"
 
 void mostrarMenuPrincipal();
-void ejecutarMenuPrincipal(sqlite3* db);
+void ejecutarMenuPrincipal(sqlite3* db, char *sendBuff, char *recvBuff, SOCKET comm_socket);
 void mostrarMenuLibros();
 void ejecutarMenuLibros(sqlite3* db);
 void buscarLibro(sqlite3* db);
@@ -29,13 +30,14 @@ void ejecutarMenuPrestamos(sqlite3* db);
 
 // CONFIGURACION DEL SISTEMA
 void crearFicheroLog();
-void leerFicheroConfiguracion();
+void leerFicheroConfiguracion(char *sendBuff, SOCKET comm_socket);
 void mostrarMenuConfiguracionFicheros();
+void ejecutarMenuConfiguracionFicheros(sqlite3*db, char *sendBuff, char *recvBuff, SOCKET comm_socket);
 void actualizarParametros(const char *clave, const char *nuevoValor);
 void mostrarMenuConfiguracionParametros();
-void ejecutarMenuConfiguracionParametros(sqlite3* db);
+void ejecutarMenuConfiguracionParametros(sqlite3* db, char *sendBuff, char *recvBuff, SOCKET comm_socket);
 void mostrarMenuConfiguracion();
-void ejecutarMenuConfiguracion(sqlite3* db);
+void ejecutarMenuConfiguracion(sqlite3* db, char *sendBuff, char *recvBuff, SOCKET comm_socket);
 
 
 // Generación de informes

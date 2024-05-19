@@ -182,6 +182,7 @@ int main(int argc, char *argv[]) {
     			char mensaje[100];  // Ajuste de tamaño según sea necesario
     			if (respuesta == 1) {
         		strcpy(mensaje, "Usuario insertado correctamente");
+				printf("Usuario agregado\n");
     			} else {
        			 strcpy(mensaje, "Error al insertar usuario, revise los datos");
     			}
@@ -195,6 +196,7 @@ int main(int argc, char *argv[]) {
 				char* usuarios = obtenerUsuarios(db);
 				send(comm_socket, usuarios, strlen(usuarios)+1, 0);
 				free(usuarios);
+				printf("Usuarios mostrados\n");
 			}
 			else if(strncmp(recvBuff, "BuscarUsuario", 13) == 0) {
 				// Código para buscar usuario
@@ -210,6 +212,7 @@ int main(int argc, char *argv[]) {
 				char* usuarios = buscarUsuariosServer(db, termino);
 
 				send(comm_socket, usuarios, strlen(usuarios) + 1, 0);
+				printf("Busqueda realizada\n");
 				free(usuarios);
 			}
 
@@ -229,11 +232,12 @@ int main(int argc, char *argv[]) {
 				char mensaje[256];
 				if (resultado == USUARIO_EDITADO_CORRECTAMENTE) {
 					strcpy(mensaje, "Usuario editado correctamente");
+					printf("Usuario editado\n");
 				} else if (resultado == USUARIO_NO_EXISTE) {
 					strcpy(mensaje, "El usuario con el ID especificado no existe");
 				} else {
 					strcpy(mensaje, "Error al editar usuario");
-				}
+					printf("Error editando usuario\n");				}
 				send(comm_socket, mensaje, strlen(mensaje) + 1, 0);
 			}
 
@@ -248,12 +252,20 @@ int main(int argc, char *argv[]) {
 				char mensaje[256];
 				if (resultado == USUARIO_BORRADO_CORRECTAMENTE) {
 					strcpy(mensaje, "Usuario borrado correctamente");
+					printf("Usuario borrado\n");
 				} else if (resultado == USUARIO_NO_EXISTE) {
 					strcpy(mensaje, "El usuario con el ID especificado no existe");
 				} else {
 					strcpy(mensaje, "Error al editar usuario");
+					printf("Error borrando usuario\n");
 				}
 				send(comm_socket, mensaje, strlen(mensaje) + 1, 0);
+			}
+			//CONFIGURACIÓN DEL SISTEMA 
+			else if(strncmp(recvBuff, "ConfiguracionSistema", 20)==0){
+				ejecutarMenuConfiguracion(db, sendBuff, recvBuff, comm_socket);
+				
+
 			}
 
 
@@ -316,7 +328,20 @@ int main(int argc, char *argv[]) {
 				const char* confirmacion = "Devolucion registrada correctamente";
 				send(comm_socket, confirmacion, strlen(confirmacion), 0);
 			}
+			else if (strcmp(recvBuff, "GestionarProblemasPrestamo") == 0) {
+				// Código para gestionar problemas de préstamo
+				char idUsuario[50];
 
+				// Recibir el ID del usuario del cliente
+				recv(comm_socket, idUsuario, sizeof(idUsuario), 0);
+
+				// Llamar a la función en dataBase.c para obtener los préstamos pendientes del usuario
+				obtenerPrestamosPendientes(db, idUsuario);
+
+				// Enviar confirmación al cliente de que los préstamos pendientes han sido obtenidos
+				const char* confirmacion = "Prestamos pendientes obtenidos correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+			}
 
 			//GENERACION DE INFORMES
 			// Esperar a que llegue un mensaje del cliente

@@ -1,8 +1,6 @@
 //para ejecutar: g++ client.cpp -o client.exe -lws2_32  
 #include <iostream>
 #include <string>
-#include <winsock2.h>
-#include <iomanip>
 #include "menu.h"
 
 #define SERVER_IP "127.0.0.1"
@@ -18,7 +16,7 @@ void clearIfNeeded(std::string &str, int max_line)
 
 char mostrarMenu()
 {
-    std::cout << "1. Gestion de Libros\n";
+    std::cout << "\n1. Gestion de Libros\n";
     std::cout << "2. Gestion de Usuarios\n";
     std::cout << "3. Gestion de Prestamos\n";
     std::cout << "4. Configuracion del Sistema\n";
@@ -40,7 +38,7 @@ int main(int argc, char *argv[]) {
     SOCKET s;
     struct sockaddr_in server;
     char sendBuff[512], recvBuff[512];
-    //sqlite3 *db;
+
 
     std::cout << "\nInitialising Winsock...\n";
     if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
@@ -407,6 +405,21 @@ int main(int argc, char *argv[]) {
                     std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                 } else if (opcionPrestamos == '4') {
                     // Código para gestionar problemas de préstamo
+                    std::string idUsuario;
+
+                    std::cout << "Ingrese el ID del usuario: ";
+                    std::cin >> idUsuario;
+
+                    // Enviar el mensaje "GestionarProblemasPrestamo" al servidor
+                    strcpy(sendBuff, "GestionarProblemasPrestamo");
+                    send(s, sendBuff, sizeof(sendBuff), 0);
+
+                    // Enviar el ID del libro al servidor
+                    send(s, idUsuario.c_str(), strlen(idUsuario.c_str()), 0);
+
+                    // Esperar la respuesta del servidor
+                    recv(s, recvBuff, sizeof(recvBuff), 0);
+                    std::cout << "Respuesta del servidor: " << recvBuff << "\n";
                 } else if (opcionPrestamos == '5') {
                     std::cout << "Volviendo al Menu Principal...\n";
                 } else {
@@ -417,9 +430,9 @@ int main(int argc, char *argv[]) {
 
         case '4':
             std::cout << "Configuracion del Sistema \n";
-            strcpy(sendBuff, "EliminarUsuario");
+            strcpy(sendBuff, "ConfiguracionSistema");
             send(s, sendBuff, sizeof(sendBuff), 0);
-            //ejecutarMenuConfiguracion(db,sendBuff,recvBuff,s);
+            ejecutarMenuConfiguracion(sendBuff,recvBuff,s);
             break;
 
 
