@@ -416,10 +416,13 @@ void leerFicheroConfiguracion(char *sendBuff, SOCKET comm_socket){
     }
 
     printf("\n=== FICHERO DE CONFIGURACION ===\n");
-    while(fgets(linea, sizeof(linea), archivo) !=NULL){
-        //printf("%s", linea);
+    while(!feof(archivo)){
+        fgets(linea,100,archivo);
         sprintf(sendBuff, "%s", linea);
         send(comm_socket, sendBuff, strlen(sendBuff), 0);
+        sendBuff[0]='\0';
+        linea[0]='\0';
+
     };
     sprintf(sendBuff, "FIN");
     send(comm_socket, sendBuff, strlen(sendBuff), 0);

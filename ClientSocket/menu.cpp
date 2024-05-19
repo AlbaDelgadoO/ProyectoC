@@ -18,10 +18,10 @@ void crearFicheroLog(){
 }
 
 void leerFicheroConfiguracion(char *recvBuff, SOCKET s){
-    recv(s,recvBuff,sizeof(recvBuff),0);
+    recv(s,recvBuff,100,0);
     while(strcmp(recvBuff,"FIN")!=0){
         std::cout<<recvBuff<<std::endl;
-        recv(s,recvBuff,sizeof(recvBuff),0);
+        recv(s,recvBuff,100,0);
     
     }
 }
@@ -149,7 +149,7 @@ void ejecutarMenuConfiguracion(char *sendBuff, char *recvBuff, SOCKET s){
     do{
         mostrarMenuConfiguracion();
         std:: cin >>opcion;
-        sprintf(sendBuff, "%s", opcion);
+        sprintf(sendBuff, "%d", opcion);
         send(s, sendBuff, strlen(sendBuff), 0);
         
         switch (opcion){
