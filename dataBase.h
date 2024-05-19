@@ -12,6 +12,8 @@ void leerLibros(sqlite3* db);
 char* obtenerDatosLibros(sqlite3* db);
 void buscarLibroBD(sqlite3* db, const char* termino);
 char* obtenerLibro(sqlite3* db, const char* termino);
+void borrarLibroConISBN(sqlite3* db, const char* isbn);
+
 
 void crearTablaUsuario(sqlite3* db);
 void insertarUsuario(sqlite3* db, Usuario usuario);

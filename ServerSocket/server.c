@@ -151,7 +151,19 @@ int main(int argc, char *argv[]) {
 				send(comm_socket, libroData, strlen(libroData) + 1, 0); // Enviar los detalles de los libros al cliente
 				free(libroData); // Liberar la memoria utilizada
 			}
+			else if (strcmp(recvBuff, "BorrarLibro") == 0) 
+			{
+				// Recibir el isbn del cliente
+				char isbn[14] = "";
+				recv(comm_socket, isbn, sizeof(isbn), 0);
 
+				// Borrar el libro en la base de datos
+				borrarLibroConISBN(db, isbn);
+
+				// Enviar confirmación al cliente de que el libro ha sido borrado
+				const char* confirmacion = "Libro insertado correctamente";
+				send(comm_socket, confirmacion, strlen(confirmacion) + 1, 0);
+			}
 			// GESTIÓN DE USUARIOS
 			else if(strncmp(recvBuff, "AgregarUsuario", 14) == 0) {
 				// Código para agregar un nuevo usuario
