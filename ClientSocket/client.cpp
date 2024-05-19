@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
         case '1':
                 char opcionLibros;
                 do{            
-                    std::cout << "\n=== Menu de Gestion de Libros ===\n1. Agregar Nuevo Libro\n2. Mostrar Todos los Libros\n3. Buscar Libro\n4. Volver al Menu Principal\n";
+                    std::cout << "\n=== Menu de Gestion de Libros ===\n1. Agregar Nuevo Libro\n2. Mostrar Todos los Libros\n3. Buscar Libro\n4. Borrar Libro\n5. Volver al Menu Principal\n";
                     std::cout << "Seleccione una opcion: ";
                     std::cin >> opcionLibros; // Captura la opción seleccionada por el usuario
 
@@ -178,6 +178,27 @@ int main(int argc, char *argv[]) {
                     } 
                     else if(opcionLibros == '4')
                     {
+                        //Codigo para borrar un libro
+                        std::string isbn;
+                        std::cout << "Ingrese el isbn del libro a borrar: ";
+                        std::getline(std::cin >> std::ws, isbn);
+
+                        //Codigo para borrar un libro
+                        strcpy(sendBuff, "BorrarLibro");
+                        send(s, sendBuff, sizeof(sendBuff), 0); 
+
+                        // Enviar el isbn al servidor
+                        send(s, isbn.c_str(), isbn.length(), 0);
+
+                        // Recibir y mostrar los resultados de la búsqueda del servidor
+                        int bytesReceived = recv(s, recvBuff, sizeof(recvBuff), 0);
+                        if (bytesReceived > 0) {
+                            recvBuff[bytesReceived] = '\0';
+                            std::cout << "\nRespuesta del servidor:\n" << recvBuff << std::endl;
+                        }
+                    }
+                    else if(opcionLibros == '5')
+                    {
                         //Codigo para volver al menu principal
                         break;
                     } 
@@ -185,7 +206,7 @@ int main(int argc, char *argv[]) {
                     {
                         std::cout << "Opcion invalida\n";
                     }
-                }while(opcionLibros != '4');
+                }while(opcionLibros != '5');
                 break;
         case '2':
             char opcionUsuarios;

@@ -216,6 +216,30 @@ char* obtenerLibro(sqlite3* db, const char* termino) {
     sqlite3_finalize(stmt); // Liberar el statement
     return librosData;
 }
+void borrarLibroConISBN(sqlite3* db, const char* isbn) {
+    // Preparar la consulta SQL para borrar un libro por su ISBN
+    char* sql = "DELETE FROM Libro WHERE ISBN = ?";
+
+    // Crear una declaración SQL
+    sqlite3_stmt* stmt;
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return;
+    }
+
+    // Bindear el parámetro ISBN a la declaración SQL
+    sqlite3_bind_text(stmt, 1, isbn, -1, SQLITE_STATIC);
+
+    // Ejecutar la consulta
+    if (sqlite3_step(stmt) != SQLITE_DONE) {
+        fprintf(stderr, "Error al ejecutar la consulta: %s\n", sqlite3_errmsg(db));
+    } else {
+        printf("Libro borrado correctamente\n");
+    }
+
+    // Finalizar la declaración
+    sqlite3_finalize(stmt);
+}
 
 void comprobarAutor(sqlite3* db, Libro libro) {
     char* sql = "SELECT * FROM Autor WHERE Nombre LIKE ? AND Apellido LIKE ?";
