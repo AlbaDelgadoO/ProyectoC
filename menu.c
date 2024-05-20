@@ -415,17 +415,22 @@ void leerFicheroConfiguracion(char *sendBuff, SOCKET comm_socket){
         return;
     }
 
-    printf("\n=== FICHERO DE CONFIGURACION ===\n");
-    while(!feof(archivo)){
-        fgets(linea,100,archivo);
+    printf("\n=== FICHERO DE CONFIGURACION EN PANTALLA ===\n");
+    
+    while (fgets(linea, 100, archivo) != NULL) {
         sprintf(sendBuff, "%s", linea);
         send(comm_socket, sendBuff, strlen(sendBuff), 0);
-        sendBuff[0]='\0';
-        linea[0]='\0';
-
-    };
+        Sleep(100); 
+    }
     sprintf(sendBuff, "FIN");
     send(comm_socket, sendBuff, strlen(sendBuff), 0);
+
+    /
+    int n = recv(comm_socket, sendBuff, 100, 0);
+    sendBuff[n] = '\0';
+    if (n > 0 && strncmp(sendBuff, "FIN", 3) == 0) {
+        printf("Mensaje de finalización recibido del cliente.\n");
+    }
     fclose(archivo);
 }
 
@@ -510,7 +515,6 @@ void mostrarMenuConfiguracionParametros(){
     printf("Seleccione una opcion: ");
 
 }
-
 void ejecutarMenuConfiguracionParametros(sqlite3* db, char *sendBuff, char *recvBuff, SOCKET comm_socket){
     int opcion;
     char nuevoValor[50];
@@ -1017,9 +1021,10 @@ char* generarInformeLibros(sqlite3* db) {
 // MENU PRINCIPAL
 
 void ejecutarMenuConfiguracion(sqlite3* db, char *sendBuff, char *recvBuff, SOCKET comm_socket){
-    int opcion; 
+    int n,opcion; 
     do{
-       recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+        n=recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+        recvBuff[n]='\0';
         sscanf(recvBuff,"%d",&opcion);
         switch (opcion){
         case 1:

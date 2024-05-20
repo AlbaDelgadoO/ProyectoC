@@ -97,6 +97,7 @@ int main(int argc, char *argv[]) {
 	printf("Waiting for incoming messages from client... \n");
 	do {
 		int bytes = recv(comm_socket, recvBuff, sizeof(recvBuff), 0);
+		recvBuff[bytes]='\0';
 		if (bytes > 0) {
 			//GESTION DE LIBROS
 			if (strncmp(recvBuff, "AgregarLibro", 12) == 0) {

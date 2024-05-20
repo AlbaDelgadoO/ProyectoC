@@ -18,11 +18,14 @@ void crearFicheroLog(){
 }
 
 void leerFicheroConfiguracion(char *recvBuff, SOCKET s){
-    recv(s,recvBuff,100,0);
-    while(strcmp(recvBuff,"FIN")!=0){
+    int n;
+	n = recv(s,recvBuff,100,0);
+	recvBuff[n]='\0';
+    while(strncmp(recvBuff,"FIN",3)!=0){
         std::cout<<recvBuff<<std::endl;
-        recv(s,recvBuff,100,0);
-    
+        recvBuff[0]='\0';
+        n=recv(s,recvBuff,100,0);
+        recvBuff[n]='\0';
     }
 }
 void mostrarMenuConfiguracionFicheros(){
@@ -50,6 +53,7 @@ void ejecutarMenuConfiguracionFicheros(char *sendBuff, char *recvBuff, SOCKET s)
         }
     }while (opcion !=2);
 }
+
 void actualizarParametros(const char *clave, const char *nuevoValor){
     std::ifstream archivo("politicas.txt");
     if(!archivo){
@@ -96,7 +100,7 @@ void actualizarParametros(const char *clave, const char *nuevoValor){
    
 }
 void mostrarMenuConfiguracionParametros(){
-    std::cout<<"\n=== Configuracion de Politicas y Parametros del Sistema ===\n1. Configurar duracion maxima de prestamo \n2. Configurar cantidad maxima de libros prestados por usuario al dia\n3.Configurar multa por devolucion tardía\n4. Volver al Menu de Configurarción del Sistema\n"; 
+    std::cout<<"\n=== Configuracion de Politicas y Parametros del Sistema ===\n1. Configurar duracion maxima de prestamo \n2. Configurar cantidad maxima de libros prestados por usuario al dia\n3.Configurar multa por devolucion tardia\n4. Volver al Menu de Configurarcion del Sistema\n"; 
     std::cout<<"Seleccione una Opcion: ";
 }
 void ejecutarMenuConfiguracionParametros(char *sendBuff, char *recvBruff, SOCKET s){
