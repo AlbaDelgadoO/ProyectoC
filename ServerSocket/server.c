@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
 				borrarLibroConISBN(db, isbn);
 
 				// Enviar confirmación al cliente de que el libro ha sido borrado
-				const char* confirmacion = "Libro insertado correctamente";
+				const char* confirmacion = "Libro borrado correctamente";
 				send(comm_socket, confirmacion, strlen(confirmacion) + 1, 0);
 			}
 			// GESTIÓN DE USUARIOS
