@@ -276,7 +276,7 @@ int main(int argc, char *argv[]) {
                 std::cout << "\nDetalles del usuario enviados al servidor\n";
 
                 std::cout << "\n======================== Coincidencias encontradas ===============================\n";
-                std::cout << std::left << std::setw(10) << "ID" << std::setw(10) << "Nombre" << std::setw(20) << "Apellido" << std::setw(25) << "Correo" << std::setw(15) << "Contraseña" << std::endl;
+                std::cout << std::left << std::setw(10) << "ID" << std::setw(10) << "Nombre" << std::setw(20) << "Apellido" << std::setw(25) << "Correo" << std::setw(15) << "Contrasenya" << std::endl;
                 std::cout << "==================================================================================\n";
 
 
@@ -306,7 +306,7 @@ int main(int argc, char *argv[]) {
                 std::cout << "Introduce el nuevo correo: ";
                 std::cin >> correoNuevo;
 
-                std::cout << "Introduce la nueva contraseña: ";
+                std::cout << "Introduce la nueva contrasenya: ";
                 std::cin >> contraNueva;
 
                 std::string mensaje = "EditarUsuario|" + id + "|" + nombreNuevo + "|" + apellidoNuevo + "|" + correoNuevo + "|" + contraNueva;
