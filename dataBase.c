@@ -113,7 +113,7 @@ void leerLibros(sqlite3* db) {
     sqlite3_finalize(stmt);
 }
 char* obtenerDatosLibros(sqlite3* db) {
-    char* librosData = malloc(4096 * sizeof(char)); // Reservar memoria para almacenar los datos de los libros
+    char* librosData = malloc(1048576 * sizeof(char)); // Reservar memoria para almacenar los datos de los libros
     librosData[0] = '\0'; // Inicializar la cadena vacía
     sqlite3_stmt* stmt;
     const char* sql = "SELECT * FROM Libro";

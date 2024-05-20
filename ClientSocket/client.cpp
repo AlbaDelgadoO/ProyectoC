@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     WSADATA wsaData;
     SOCKET s;
     struct sockaddr_in server;
-    char sendBuff[512], recvBuff[512];
+    char sendBuff[1024], recvBuff[1024];
 
 
     std::cout << "\nInitialising Winsock...\n";
