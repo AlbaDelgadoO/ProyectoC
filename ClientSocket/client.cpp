@@ -1,7 +1,7 @@
 //para ejecutar: g++ client.cpp -o client.exe -lws2_32  
 #include <iostream>
 #include <string>
-#include "menu.h"
+#include "menu+.h"
 
 #define SERVER_IP "127.0.0.1"
 #define SERVER_PORT 6000

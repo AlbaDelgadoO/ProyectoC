@@ -372,27 +372,20 @@ int main(int argc, char *argv[]) {
 			// Procesar la solicitud del cliente
 			else if (strcmp(recvBuff, "informeUsuario") == 0) {
 				// Lógica para generar el informe de usuarios
-				//generarInformeUsuarios(db);
-				// Enviar confirmación al cliente de que el libro ha sido insertado
-				//const char* confirmacion = "Informe de usuario generado correctamente";
-				//send(comm_socket, confirmacion, strlen(confirmacion), 0);
-
-				printf("Cargando");
-				// Lógica para generar el informe de usuarios
 				char* informeUsuarios = generarInformeUsuarios(db);
 				// Enviar informe generado al cliente
 				send(comm_socket, informeUsuarios, strlen(informeUsuarios), 0);
 				free(informeUsuarios); // Liberar memoria del informe generado
 			} else if (strcmp(recvBuff, "informePrestamos") == 0) {
 				// Lógica para generar el informe de préstamos
-				generarInformePrestamos(db);
-				const char* confirmacion = "Informe de prestamos generado correctamente";
-				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+				char* informeUsuarios = generarInformePrestamos(db);
+				send(comm_socket, informeUsuarios, strlen(informeUsuarios), 0);
+				free(informeUsuarios); // Liberar memoria del informe generado
 			} else if (strcmp(recvBuff, "informeLibros") == 0) {
-				// Lógica para generar el informe de libros
-				generarInformeLibros(db);
-				const char* confirmacion = "Informe de usuario libros correctamente";
-				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+				// Lógica para generar el informe de préstamos
+				char* informeUsuarios = generarInformeLibros(db);
+				send(comm_socket, informeUsuarios, strlen(informeUsuarios), 0);
+				free(informeUsuarios); // Liberar memoria del informe generado
 			} else {
 				// Mensaje de solicitud no reconocida
 				const char* mensajeError = "Solicitud no reconocida";

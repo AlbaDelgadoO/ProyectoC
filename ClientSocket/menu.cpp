@@ -3,7 +3,7 @@
 #include <fstream>
 #include <cstring>
 #include <winsock2.h>
-#include "menu.h"
+#include "menu+.h"
 
 void crearFicheroLog(){
     std::ofstream archivoLog("registro.log");
