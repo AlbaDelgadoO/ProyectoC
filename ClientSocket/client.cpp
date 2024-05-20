@@ -435,13 +435,13 @@ int main(int argc, char *argv[]) {
                     strcpy(sendBuff, "GestionarProblemasPrestamo");
                     send(s, sendBuff, sizeof(sendBuff), 0);
 
-                    // Enviar el ID del libro al servidor
-                    send(s, idUsuario.c_str(), strlen(idUsuario.c_str()), 0);
+                    // Enviar el ID del usuario al servidor
+                    send(s, idUsuario.c_str(), strlen(idUsuario.c_str()) + 1, 0);
 
                     // Esperar la respuesta del servidor
                     recv(s, recvBuff, sizeof(recvBuff), 0);
                     std::cout << "Respuesta del servidor: " << recvBuff << "\n";
-                } else if (opcionPrestamos == '5') {
+                }else if (opcionPrestamos == '5') {
                     std::cout << "Volviendo al Menu Principal...\n";
                 } else {
                     std::cout << "Opcion no valida. Por favor, seleccione una opcion valida.\n";

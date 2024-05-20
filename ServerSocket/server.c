@@ -281,37 +281,42 @@ int main(int argc, char *argv[]) {
 
 			}
 
-
 			// GESTIÓN DE PRESTAMOS
 			else if (strncmp(recvBuff, "AgregarPrestamo|", 15) == 0) {
-                // Código para agregar un nuevo préstamo
-                char* token;
-                token = strtok(recvBuff, "|");
-                token = strtok(NULL, "|"); // Skip "AgregarPrestamo"
+				// Código para agregar un nuevo préstamo
+				char* token;
+				token = strtok(recvBuff, "|");
+				token = strtok(NULL, "|"); // Skip "AgregarPrestamo"
 
-                char idLibro[13], idUsuario[13], fechaVencimiento[20];
+				char idLibro[13], idUsuario[13], fechaVencimiento[20];
 
-                strncpy(idLibro, token, 12); idLibro[12] = '\0'; token = strtok(NULL, "|");
-                strncpy(idUsuario, token, 12); idUsuario[12] = '\0'; token = strtok(NULL, "|");
-                strncpy(fechaVencimiento, token, 19); fechaVencimiento[19] = '\0';
+				strncpy(idLibro, token, 12); idLibro[12] = '\0'; token = strtok(NULL, "|");
+				strncpy(idUsuario, token, 12); idUsuario[12] = '\0'; token = strtok(NULL, "|");
+				strncpy(fechaVencimiento, token, 19); fechaVencimiento[19] = '\0';
 
 				printf("ID Libro: %s\n", idLibro);
 				printf("ID Usuario: %s\n", idUsuario);
 				printf("Fecha de vencimiento: %s\n", fechaVencimiento);
 
+				// Verificar si el usuario existe
+				if (existeUsuario(db, idUsuario)) {
+					// Crear una instancia de Prestamo con los detalles recibidos
+					Prestamo nuevoPrestamo;
+					strcpy(nuevoPrestamo.ISBN, idLibro);
+					strcpy(nuevoPrestamo.ID_Usuario, idUsuario);
+					strcpy(nuevoPrestamo.fechaDevolucion, fechaVencimiento);
 
-                // Crear una instancia de Prestamo con los detalles recibidos
-                Prestamo nuevoPrestamo;
-                strcpy(nuevoPrestamo.ISBN, idLibro);
-                strcpy(nuevoPrestamo.ID_Usuario, idUsuario);
-                strcpy(nuevoPrestamo.fechaDevolucion, fechaVencimiento);
+					// Insertar el nuevo préstamo en la base de datos
+					insertarPrestamo(db, nuevoPrestamo);
 
-                // Insertar el nuevo préstamo en la base de datos
-                insertarPrestamo(db, nuevoPrestamo);
-
-                // Enviar confirmación al cliente de que el préstamo ha sido insertado
-                const char* confirmacion = "Prestamo insertado correctamente";
-                send(comm_socket, confirmacion, strlen(confirmacion) + 1, 0);  // Add +1 to include the null terminator
+					// Enviar confirmación al cliente de que el préstamo ha sido insertado
+					const char* confirmacion = "Prestamo insertado correctamente";
+					send(comm_socket, confirmacion, strlen(confirmacion) + 1, 0); // Add +1 to include the null terminator
+				} else {
+					// Enviar mensaje de error al cliente si el usuario no existe
+					const char* error = "Error: Usuario no existe";
+					send(comm_socket, error, strlen(error) + 1, 0); // Add +1 to include the null terminator
+				}
 			}
 			else if (strcmp(recvBuff, "RenovarPrestamo") == 0) {
 				// Código para renovar un préstamo existente
@@ -351,10 +356,14 @@ int main(int argc, char *argv[]) {
 				// Llamar a la función en dataBase.c para obtener los préstamos pendientes del usuario
 				obtenerPrestamosPendientes(db, idUsuario);
 
-				// Enviar confirmación al cliente de que los préstamos pendientes han sido obtenidos
-				const char* confirmacion = "Prestamos pendientes obtenidos correctamente";
-				send(comm_socket, confirmacion, strlen(confirmacion), 0);
+				// Obtener el resultado de la función
+				const char* resultado = obtenerResultadoBuffer();
+
+				// Enviar los préstamos pendientes al cliente
+				send(comm_socket, resultado, strlen(resultado) + 1, 0);
 			}
+
+
 
 			//GENERACION DE INFORMES
 			// Esperar a que llegue un mensaje del cliente

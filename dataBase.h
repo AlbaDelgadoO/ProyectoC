@@ -35,10 +35,12 @@ void ejecutarMenuEdicion(sqlite3* db, char* id);
 void editarUsuarioDB(sqlite3* db, char* id);
 void borrarUsuarioDB(sqlite3 *db, char* id);
 void crearTablaPrestamo(sqlite3* db);
+bool existeUsuario(sqlite3* db, const char* idUsuario);
 void insertarPrestamo(sqlite3* db, Prestamo p);
 void renovarPrestamoDB(sqlite3* db, char* idLibro);
 bool registrarDevolucionLibro(sqlite3* db, char* idLibro);
 void obtenerPrestamosPendientes(sqlite3* db, const char* idUsuario);
+const char* obtenerResultadoBuffer();
 
 //AUTOR
 void insertarAutor(sqlite3*db, Libro libro);
@@ -51,4 +53,5 @@ void borrarUsuarioTabla(sqlite3* db);
 void borrarAutor(sqlite3* db);
 void borrarPrestamo(sqlite3* db);
 void borrarLibro(sqlite3* db);
+
 #endif /* DATABASE_H */

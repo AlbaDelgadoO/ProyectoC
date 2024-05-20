@@ -764,6 +764,23 @@ void crearTablaPrestamo(sqlite3* db) {
     }
 }
 
+bool existeUsuario(sqlite3* db, const char* idUsuario) {
+    char sql[100];
+    sprintf(sql, "SELECT 1 FROM Usuario WHERE ID_Usuario = '%s'", idUsuario);
+    sqlite3_stmt* stmt;
+    int result = sqlite3_prepare_v2(db, sql, -1, &stmt, NULL);
+    if (result != SQLITE_OK) {
+        fprintf(stderr, "Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        return false;
+    }
+
+    result = sqlite3_step(stmt);
+    bool exists = (result == SQLITE_ROW);
+
+    sqlite3_finalize(stmt);
+    return exists;
+}
+
 void insertarPrestamo(sqlite3* db, Prestamo p)
 {
     // Insertar el nuevo préstamo en la base de datos
@@ -859,6 +876,9 @@ bool registrarDevolucionLibro(sqlite3* db, char* idLibro) {
     return prestamosActivos;
 }
 
+// Definición de un buffer estático para almacenar resultados
+static char resultadoBuffer[1024];
+
 void obtenerPrestamosPendientes(sqlite3* db, const char* idUsuario) {
     // Consultar la tabla Prestamo para obtener los préstamos pendientes del usuario especificado
     char selectSql[200];
@@ -866,23 +886,30 @@ void obtenerPrestamosPendientes(sqlite3* db, const char* idUsuario) {
     sqlite3_stmt* stmt;
     int result = sqlite3_prepare_v2(db, selectSql, -1, &stmt, NULL);
     if (result != SQLITE_OK) {
-        printf("Error al preparar la consulta: %s\n", sqlite3_errmsg(db));
+        snprintf(resultadoBuffer, sizeof(resultadoBuffer), "Error al preparar la consulta: %s", sqlite3_errmsg(db));
         return;
     }
 
-    // Mostrar los préstamos pendientes del usuario
-    printf("Prestamos pendientes del usuario %s:\nISBN_Libro\tFecha_Vencimiento\n", idUsuario);
+    // Limpiar el buffer antes de usarlo
+    memset(resultadoBuffer, 0, sizeof(resultadoBuffer));
+    
+    // Formatear los préstamos pendientes del usuario en el buffer estático
+    snprintf(resultadoBuffer, sizeof(resultadoBuffer), "Prestamos pendientes del usuario %s:\nISBN_Libro\tFecha_Vencimiento\n", idUsuario);
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         const char* idLibro = (const char*)sqlite3_column_text(stmt, 0);
         const char* fechaVencimiento = (const char*)sqlite3_column_text(stmt, 1);
-        printf("%s\t\t%s\n", idLibro, fechaVencimiento);
+        snprintf(resultadoBuffer + strlen(resultadoBuffer), sizeof(resultadoBuffer) - strlen(resultadoBuffer), "%s\t\t%s\n", idLibro, fechaVencimiento);
     }
-
-    printf("\n");
 
     // Liberar la consulta preparada
     sqlite3_finalize(stmt);
 }
+
+// Función para obtener el contenido del resultadoBuffer
+const char* obtenerResultadoBuffer() {
+    return resultadoBuffer;
+}
+
 
 //TABLA AUTOR
 void crearTablaAutor(sqlite3* db){
