@@ -425,7 +425,7 @@ void leerFicheroConfiguracion(char *sendBuff, SOCKET comm_socket){
     sprintf(sendBuff, "FIN");
     send(comm_socket, sendBuff, strlen(sendBuff), 0);
 
-    /
+
     int n = recv(comm_socket, sendBuff, 100, 0);
     sendBuff[n] = '\0';
     if (n > 0 && strncmp(sendBuff, "FIN", 3) == 0) {
